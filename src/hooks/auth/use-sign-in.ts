@@ -1,0 +1,67 @@
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import * as z from "zod";
+import { API_URL } from "@/lib/utils";
+
+const UserRole = ["user", "seller"] as const;
+
+export type TUserRole = (typeof UserRole)[number];
+
+export const signInSchema = z.object({
+	
+	username: z.email("Invalid email address"),
+	password: z.string().min(4, "Password must be at least 4 characters"),
+	
+});
+
+export type SignInInput = z.infer<typeof signInSchema>;
+
+
+  
+export interface SignInResponse {
+	id: number; 
+    jwtCookie: any; 
+    username: string;
+    roles: Array<string>
+	
+}
+
+
+
+async function signIn(
+	input: SignInInput,
+): Promise<SignInResponse> {
+
+	const response = await fetch(`${API_URL}/auth/sign-in`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		credentials: "include",
+		body: JSON.stringify(input),
+	});
+
+	if (!response.ok) {
+		const error = await response
+			.json()
+			.catch(() => ({ message: "Registration failed" }));
+		throw new Error(error.message);
+		
+	}
+
+	return response.json();
+}
+
+export function useSignIn() {
+	return useMutation({
+		mutationFn: signIn,
+		onSuccess: (data) => {
+			toast.success("User Signed in Successfully"); 
+			console.log(data); 
+		},
+		onError: (error) => {
+			console.error(`Error while Signing in | Error '${error.message}' ` ); 
+		toast.error(`Error while Signing in   | Error '${error.message}' ` ); 
+		}
+	});
+}
