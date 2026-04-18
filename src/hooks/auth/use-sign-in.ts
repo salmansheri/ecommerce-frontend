@@ -1,11 +1,12 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as z from "zod";
 import { API_URL } from "@/lib/utils";
-import { signInMutation } from "@/generated/@tanstack/react-query.gen";
+import { getCurrentUserDetailsQueryKey, signInMutation } from "@/generated/@tanstack/react-query.gen";
 import { LoginResponseDto } from "@/generated";
 import { setAuthUser } from "@/lib/auth-store";
 import { useNavigate } from "@tanstack/react-router";
+
 
 const UserRole = ["user", "seller"] as const;
 
@@ -72,6 +73,7 @@ async function signIn(
 
 export function useSignIn() {
 	const navigate = useNavigate(); 
+	const queryClient = useQueryClient(); 
 	return useMutation({
 		...signInMutation(),
 		onSuccess: (data: LoginResponseDto) => {
@@ -81,7 +83,8 @@ export function useSignIn() {
 				id: data?.id,
 				roles: data?.roles,
 				username: data?.username
-			}) 
+			}); 
+			queryClient.invalidateQueries({ queryKey: getCurrentUserDetailsQueryKey()}) 
 			console.log(data); 
 			navigate({
 				to: "/"
