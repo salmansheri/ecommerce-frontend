@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart } from "lucide-react";
+import { toast } from "sonner";
+import { addToCart } from "@/lib/cart-store";
 import type { TProduct } from "@/lib/data/product";
-import { formatNumberToCurrency, formatNumberToPercentage } from "@/lib/utils";
+import { formatNumberToCurrency } from "@/lib/utils";
 import { Button } from "./ui/button";
 import {
 	Card,
@@ -17,6 +19,12 @@ interface IProductCardProps {
 }
 function ProductCard({ product }: IProductCardProps) {
 	const isAvailable = product.quantity && Number(product.quantity) > 0;
+
+	const handleAddToCart = () => {
+		addToCart(product.productId, 1);
+		toast.success(`${product.name} added to cart`);
+	};
+
 	return (
 		<Card className="">
 			<CardHeader>
@@ -37,20 +45,19 @@ function ProductCard({ product }: IProductCardProps) {
 					<CardDescription className="text-left">
 						{product.description}
 					</CardDescription>
-					
 				</div>
 			</CardContent>
 			<CardFooter className="flex items-center justify-between">
 				<div className="flex flex-col items-center justify-between">
-					{/* <span className="text-neutral-100/50">
-							{formatNumberToPercentage(product.discount)} Off
-						</span> */}
-						<span className="font-bold">
-							{formatNumberToCurrency(product.price)}
-						</span>
-						
-					</div>
-				<Button disabled={!isAvailable} variant="outline">
+					<span className="font-bold">
+						{formatNumberToCurrency(product.price)}
+					</span>
+				</div>
+				<Button
+					disabled={!isAvailable}
+					variant="outline"
+					onClick={handleAddToCart}
+				>
 					{isAvailable ? (
 						<>
 							<ShoppingCart />

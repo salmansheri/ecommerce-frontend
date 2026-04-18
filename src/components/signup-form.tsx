@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
+import { Link } from "@tanstack/react-router";
 import { Loader } from "lucide-react";
 import { useId } from "react";
-import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,61 +19,49 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { type RegisterUserInput, useRegisterUser } from "@/hooks/auth/use-register-user";
+import { useRegisterUser } from "@/hooks/auth/use-register-user";
 import { PasswordInput } from "./password-input";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "./ui/select";
-
-// {
-//     "username":"user3",
-//     "email":"user3email@gmail.com",
-//     "password":"password3",
-//     "role":["user"]
-// }
-
-
 
 const formSchema = z.object({
 	username: z.string().min(5, "user name must be atleast 5 characters"),
 	email: z.email(),
 	password: z.string().min(4, "Password must be atleast 4 characters"),
-
 });
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 	const id = useId();
 
-	const {mutate, isPending } = useRegisterUser(); 
+	const { mutate, isPending } = useRegisterUser();
 
 	const form = useForm({
 		defaultValues: {
 			username: "",
 			email: "",
 			password: "",
-			
 		},
 		validators: {
 			onSubmit: formSchema,
 			onChange: formSchema,
-			
 		},
-		onSubmit: async ({value}) => {
+		onSubmit: async ({ value }) => {
 			mutate(value);
 		},
 	});
 
 	return (
-		<Card className="w-full max-w-md my-5" {...props}>
+		<Card
+			className="my-3 w-full max-w-md border-border/70 bg-card/95 shadow-xl backdrop-blur"
+			{...props}
+		>
 			<CardHeader className="text-center">
-				<CardTitle className="text-2xl">Create an account</CardTitle>
+				<div className="mx-auto mb-2 inline-flex rounded-full border border-border/70 bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+					Get started
+				</div>
+				<CardTitle className="text-2xl tracking-tight">
+					Create your ShopVerse account
+				</CardTitle>
 				<CardDescription>
-					Enter your information below to create your account
+					Join in seconds and start shopping smarter.
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -101,6 +89,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 											aria-invalid={isInValid}
 											type="text"
 											placeholder="John Doe"
+											className="h-10 bg-background/70"
 											required
 										/>
 										{isInValid && (
@@ -125,7 +114,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
 											aria-invalid={isInvalid}
+											type="email"
 											placeholder="Enter your Email"
+											className="h-10 bg-background/70"
 										/>
 										<FieldDescription>
 											We&apos;ll use this to contact you. We will not share your
@@ -153,6 +144,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 											onChange={(e) => field.handleChange(e.target.value)}
 											aria-invalid={isInvalid}
 											placeholder="Enter your Password"
+											className="h-10 bg-background/70"
 										/>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
@@ -161,28 +153,30 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 								);
 							}}
 						</form.Field>
-						
-
-						<Field className="flex flex-col gap-4 mt-2">
-							<Button disabled={isPending} type="submit" className="w-full inline-flex">
+						<Field className="mt-2 flex flex-col gap-4">
+							<Button
+								disabled={isPending}
+								type="submit"
+								className="inline-flex h-10 w-full bg-foreground text-background hover:bg-foreground/90"
+							>
 								{isPending ? (
 									<>
-									<Loader className="animate-spin mr-2" />
-									Loading...
+										<Loader className="mr-2 animate-spin" />
+										Creating account...
 									</>
-									
-								): "Create Account"}
-								
+								) : (
+									"Create Account"
+								)}
 							</Button>
 						</Field>
 						<FieldDescription className="text-center">
 							Already have an account?{" "}
-							<a
-								href="/auth/sign-in"
-								className="underline underline-offset-4 hover:text-primary"
+							<Link
+								to="/auth/sign-in"
+								className="font-medium underline underline-offset-4 hover:text-primary"
 							>
 								Sign in
-							</a>
+							</Link>
 						</FieldDescription>
 					</FieldGroup>
 				</form>

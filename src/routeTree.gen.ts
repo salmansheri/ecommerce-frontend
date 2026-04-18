@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIndexRouteImport } from './routes/product/index'
+import { Route as CartIndexRouteImport } from './routes/cart/index'
 import { Route as ProductProductIdRouteImport } from './routes/product/$productId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTableRouteImport } from './routes/demo/table'
@@ -36,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
 const ProductIndexRoute = ProductIndexRouteImport.update({
   id: '/product/',
   path: '/product/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartIndexRoute = CartIndexRouteImport.update({
+  id: '/cart/',
+  path: '/cart/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductProductIdRoute = ProductProductIdRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/cart': typeof CartIndexRoute
   '/product': typeof ProductIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/cart': typeof CartIndexRoute
   '/product': typeof ProductIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/product/$productId': typeof ProductProductIdRoute
+  '/cart/': typeof CartIndexRoute
   '/product/': typeof ProductIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/product/$productId'
+    | '/cart'
     | '/product'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/product/$productId'
+    | '/cart'
     | '/product'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/product/$productId'
+    | '/cart/'
     | '/product/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
+  CartIndexRoute: typeof CartIndexRoute
   ProductIndexRoute: typeof ProductIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
@@ -278,6 +291,13 @@ declare module '@tanstack/react-router' {
       path: '/product'
       fullPath: '/product'
       preLoaderRoute: typeof ProductIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart/': {
+      id: '/cart/'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$productId': {
@@ -401,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   ProductProductIdRoute: ProductProductIdRoute,
+  CartIndexRoute: CartIndexRoute,
   ProductIndexRoute: ProductIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,

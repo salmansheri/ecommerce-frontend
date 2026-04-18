@@ -1,7 +1,5 @@
-
 import { useForm } from "@tanstack/react-form";
-import { useId } from "react";
-import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,56 +15,47 @@ import {
 	FieldError,
 	FieldGroup,
 	FieldLabel,
-
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useSignIn } from "@/hooks/auth/use-sign-in";
 import { PasswordInput } from "./password-input";
 
-
-// {
-//     "username":"user3",
-//     "email":"user3email@gmail.com",
-//     "password":"password3",
-//     "role":["user"]
-// }
-
-const UserRole = ["user", "seller"] as const;
-
 const formSchema = z.object({
-	
 	username: z.string().min(4, "username must be atleast 4 characters"),
 	password: z.string().min(4, "Password must be atleast 4 characters"),
-
 });
 
 export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
-    const {mutate, isPending} = useSignIn(); 
-	
+	const { mutate, isPending } = useSignIn();
 
 	const form = useForm({
 		defaultValues: {
-		
 			username: "",
-			password: ""
-			
+			password: "",
 		},
 		validators: {
 			onSubmit: formSchema,
-			onChange: formSchema
+			onChange: formSchema,
 		},
 		onSubmit: async ({ value }) => {
-            mutate(value); 
-			
+			mutate(value);
 		},
 	});
 
 	return (
-		<Card className="w-full max-w-md mx-auto" {...props}>
+		<Card
+			className="w-full max-w-md border-border/70 bg-card/95 shadow-xl backdrop-blur"
+			{...props}
+		>
 			<CardHeader className="text-center">
-				<CardTitle className="text-2xl">Create an account</CardTitle>
+				<div className="mx-auto mb-2 inline-flex rounded-full border border-border/70 bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+					Welcome back
+				</div>
+				<CardTitle className="text-2xl tracking-tight">
+					Sign in to ShopVerse
+				</CardTitle>
 				<CardDescription>
-					Enter your information below to create your account
+					Access your orders, wishlist, and personalized deals.
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -78,14 +67,12 @@ export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
 					}}
 				>
 					<FieldGroup>
-						
-
 						<form.Field name="username">
 							{(field) => {
 								const isInvalid =
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
-									<Field  data-invalid={isInvalid}>
+									<Field data-invalid={isInvalid}>
 										<FieldLabel htmlFor={field.name}>Username</FieldLabel>
 										<Input
 											id={field.name}
@@ -94,11 +81,11 @@ export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
 											aria-invalid={isInvalid}
-											placeholder="Enter your Email"
+											placeholder="johnsmith"
+											className="h-10 bg-background/70"
 										/>
 										<FieldDescription>
-											We&apos;ll use this to contact you. We will not share your
-											email with anyone else.
+											Use your registered username to continue.
 										</FieldDescription>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
@@ -122,6 +109,7 @@ export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
 											onChange={(e) => field.handleChange(e.target.value)}
 											aria-invalid={isInvalid}
 											placeholder="Enter your Password"
+											className="h-10 bg-background/70"
 										/>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
@@ -130,22 +118,24 @@ export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
 								);
 							}}
 						</form.Field>
-						
 
-						<Field className="flex flex-col gap-4 mt-2">
-							<Button type="submit" className="w-full">
-								Create Account
+						<Field className="mt-2 flex flex-col gap-4">
+							<Button
+								type="submit"
+								disabled={isPending}
+								className="h-10 w-full bg-foreground text-background hover:bg-foreground/90"
+							>
+								{isPending ? "Signing in..." : "Sign In"}
 							</Button>
-							
 						</Field>
 						<FieldDescription className="text-center">
-							New?
-							<a
-								href="/auth/sign-up"
-								className="underline underline-offset-4 hover:text-primary"
+							New here?{" "}
+							<Link
+								to="/auth/sign-up"
+								className="font-medium underline underline-offset-4 hover:text-primary"
 							>
-								Sign Up
-							</a>
+								Create your account
+							</Link>
 						</FieldDescription>
 					</FieldGroup>
 				</form>

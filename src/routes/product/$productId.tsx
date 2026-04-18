@@ -8,7 +8,9 @@ import {
 	Star,
 	Truck,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { addToCart } from "@/lib/cart-store";
 import { products } from "@/lib/data/product";
 import { formatNumberToCurrency, formatNumberToPercentage } from "@/lib/utils";
 
@@ -52,7 +54,11 @@ function RouteComponent() {
 		"Fast dispatch and reliable delivery tracking",
 	];
 	const previewTiles = [1, 2, 3, 4];
-	
+
+	const handleAddToCart = () => {
+		addToCart(product.productId, 1);
+		toast.success(`${product.name} added to cart`);
+	};
 
 	return (
 		<section className="bg-gradient-to-b from-background to-muted/30 px-4 py-10 sm:px-8 lg:px-14 lg:py-14">
@@ -152,6 +158,7 @@ function RouteComponent() {
 								className="h-11 flex-1 text-base"
 								size="lg"
 								disabled={!isAvailable}
+								onClick={handleAddToCart}
 							>
 								<ShoppingCart />
 								{isAvailable ? "Add to Cart" : "Stock Out"}
