@@ -5,7 +5,8 @@ import { CustomSelect } from "@/components/custom-select";
 import { LoaderWrapper } from "@/components/loader-wrapper";
 import { PaginationUI } from "@/components/paginationUI";
 import ProductCard from "@/components/productCard";
-import { categories } from "@/lib/data/category";
+import { useGetCategories } from "@/hooks/categories/use-get-categories";
+
 import { products } from "@/lib/data/product";
 
 const productSearchSchema = z.object({
@@ -16,16 +17,16 @@ const productSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/product/")({
-	component: RouteComponent,
+	component: Product,
 	loader: () => {
 		// throw new Error("Some went wrong")
 	},
 	validateSearch: zodValidator(productSearchSchema),
 });
 
-function RouteComponent() {
+function Product() {
 	const { page, category } = Route.useSearch();
-	const isLoading = false;
+	
 	const pageSize = 10;
 	const totalProducts = products.length;
 	const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize));
@@ -33,6 +34,8 @@ function RouteComponent() {
 	const startIndex = (safePage - 1) * pageSize;
 	const endIndex = Math.min(startIndex + pageSize, totalProducts);
 	const visibleProducts = products.slice(startIndex, endIndex);
+
+	const { data: categories, isLoading: isLoadingCategory} = useGetCategories(); 
 
 	return (
 		<section className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 px-4 py-10 sm:px-8 lg:px-14 lg:py-14">
@@ -61,7 +64,7 @@ function RouteComponent() {
 								<p className="text-xs text-muted-foreground">Pages</p>
 							</div>
 							<div className="rounded-xl border bg-background/70 p-3 text-center col-span-2 sm:col-span-1">
-								<p className="text-xl font-bold">{categories.length}</p>
+								<p className="text-xl font-bold">{categories?.data?.length}</p>
 								<p className="text-xs text-muted-foreground">Categories</p>
 							</div>
 						</div>
@@ -76,7 +79,7 @@ function RouteComponent() {
 						</p>
 					</div>
 					<div className="flex flex-col items-center gap-3">
-						<CustomSelect value={category} data={categories} />
+						<CustomSelect value={category} data={categories?.data} />
 						{category ? (
 							<span className="min-w-[110px] rounded-full border bg-muted px-3 py-1 text-center text-xs font-medium text-muted-foreground">
 								Category: {category}
@@ -90,7 +93,7 @@ function RouteComponent() {
 				</div>
 
 				<div className="mt-8 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
-					<LoaderWrapper isLoading={isLoading}>
+					<LoaderWrapper isLoading={isLoadingCategory}>
 						<div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
 							<p className="text-sm text-muted-foreground">
 								Showing {startIndex + 1}-{endIndex} of {totalProducts} products

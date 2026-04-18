@@ -11,7 +11,7 @@ import {
 import type { TCategory } from "@/lib/data/category";
 
 interface CustomSelectProps {
-	data: TCategory[];
+	data: any;
 	value: string;
 }
 
@@ -29,8 +29,8 @@ export function CustomSelect({ data, value }: CustomSelectProps) {
 			<SelectContent>
 				<SelectGroup>
 					<SelectLabel>Categories</SelectLabel>
-					{data.map((category) => (
-						<SelectItem key={category.name} value={category.name}>
+					{data?.map((category: any) => (
+						<SelectItem key={category.id} value={category.name}>
 							{category.name}
 						</SelectItem>
 					))}
