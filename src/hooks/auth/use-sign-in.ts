@@ -2,6 +2,9 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as z from "zod";
 import { API_URL } from "@/lib/utils";
+import { signInMutation } from "@/generated/@tanstack/react-query.gen";
+import { LoginResponseDto } from "@/generated";
+import { setAuthUser } from "@/lib/auth-store";
 
 const UserRole = ["user", "seller"] as const;
 
@@ -52,14 +55,33 @@ async function signIn(
 	return response.json();
 }
 
+// export function useSignIn() {
+// 	return useMutation({
+// 		mutationFn: signIn,
+// 		onSuccess: (data) => {
+// 			toast.success("User Signed in Successfully"); 
+// 			console.log(data); 
+// 		},
+// 		onError: (error) => {
+// 			console.error(`Error while Signing in | Error '${error.message}' ` ); 
+// 		toast.error(`Error while Signing in   | Error '${error.message}' ` ); 
+// 		}
+// 	});
+// }
+
 export function useSignIn() {
 	return useMutation({
-		mutationFn: signIn,
-		onSuccess: (data) => {
-			toast.success("User Signed in Successfully"); 
+		...signInMutation(),
+		onSuccess: (data: LoginResponseDto) => {
+			toast.success("User Signed in Successfully");
+			setAuthUser({
+				id: data?.id,
+				roles: data?.roles,
+				username: data?.username
+			}) 
 			console.log(data); 
 		},
-		onError: (error) => {
+		onError: (error: any) => {
 			console.error(`Error while Signing in | Error '${error.message}' ` ); 
 		toast.error(`Error while Signing in   | Error '${error.message}' ` ); 
 		}

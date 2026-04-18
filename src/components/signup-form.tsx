@@ -44,7 +44,13 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 			onChange: formSchema,
 		},
 		onSubmit: async ({ value }) => {
-			mutate(value);
+			mutate({
+				body: {
+					username: value.username,
+					email: value.email,
+					password: value.password
+				}
+			});
 		},
 	});
 

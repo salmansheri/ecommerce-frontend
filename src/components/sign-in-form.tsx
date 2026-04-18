@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useSignIn } from "@/hooks/auth/use-sign-in";
 import { PasswordInput } from "./password-input";
+import { setAuthUser } from "@/lib/auth-store";
 
 const formSchema = z.object({
 	username: z.string().min(4, "username must be atleast 4 characters"),
@@ -38,7 +39,14 @@ export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
 			onChange: formSchema,
 		},
 		onSubmit: async ({ value }) => {
-			mutate(value);
+			mutate({
+				body: {
+					username: value.username,
+					password: value.password
+				}
+			});
+
+			
 		},
 	});
 
