@@ -22,5 +22,6 @@ export const categories = [
 ];
 
 export type TCategory = {
+	id: number; 
 	name: string;
 };
