@@ -8,6 +8,10 @@ import ProductCard from "@/components/productCard";
 import { useGetCategories } from "@/hooks/categories/use-get-categories";
 
 import { products } from "@/lib/data/product";
+import { useState } from "react";
+import { useGetProductsByCategoryId } from "@/hooks/products/use-get-products-by-categoryId";
+import { ca } from "zod/v4/locales";
+import Products from "@/components/products";
 
 const productSearchSchema = z.object({
 	page: z.number().default(1),
@@ -28,14 +32,25 @@ function Product() {
 	const { page, category } = Route.useSearch();
 	
 	const pageSize = 10;
-	const totalProducts = products.length;
+
+	const { data: products, isLoading: isProductsLoading } = useGetProductsByCategoryId(Number(category), page, pageSize); 
+	const { data: categories, isLoading: isLoadingCategory} = useGetCategories(); 
+
+	const categoryList = categories?.data ?? []; 
+
+	const productList = products?.data ?? []; 
+	const totalProducts = productList.length;
+	
 	const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize));
 	const safePage = Math.min(Math.max(1, page), totalPages);
 	const startIndex = (safePage - 1) * pageSize;
 	const endIndex = Math.min(startIndex + pageSize, totalProducts);
-	const visibleProducts = products.slice(startIndex, endIndex);
+	
+	const visibleProducts = productList.slice(startIndex, endIndex);
 
-	const { data: categories, isLoading: isLoadingCategory} = useGetCategories(); 
+	
+
+	
 
 	return (
 		<section className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 px-4 py-10 sm:px-8 lg:px-14 lg:py-14">
@@ -64,7 +79,7 @@ function Product() {
 								<p className="text-xs text-muted-foreground">Pages</p>
 							</div>
 							<div className="rounded-xl border bg-background/70 p-3 text-center col-span-2 sm:col-span-1">
-								<p className="text-xl font-bold">{categories?.data?.length}</p>
+								<p className="text-xl font-bold">{categoryList.length}</p>
 								<p className="text-xs text-muted-foreground">Categories</p>
 							</div>
 						</div>
@@ -93,7 +108,7 @@ function Product() {
 				</div>
 
 				<div className="mt-8 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
-					<LoaderWrapper isLoading={isLoadingCategory}>
+					<LoaderWrapper isLoading={isLoadingCategory || isProductsLoading}>
 						<div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
 							<p className="text-sm text-muted-foreground">
 								Showing {startIndex + 1}-{endIndex} of {totalProducts} products
@@ -102,16 +117,12 @@ function Product() {
 								Page {safePage} of {totalPages}
 							</p>
 						</div>
-						<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-							{visibleProducts.map((product) => (
-								<ProductCard key={product.productId} product={product} />
-							))}
-						</div>
+						<Products products={visibleProducts} />
 						<div className="mt-8 border-t pt-4">
 							<PaginationUI
 								pageSize={pageSize}
 								page={safePage}
-								products={products}
+								products={productList}
 							/>
 						</div>
 					</LoaderWrapper>

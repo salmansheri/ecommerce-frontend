@@ -13,15 +13,16 @@ import {
 	CardHeader,
 	CardTitle,
 } from "./ui/card";
+import { ProductDto } from "@/generated";
 
 interface IProductCardProps {
-	product: TProduct;
+	product: ProductDto;
 }
 function ProductCard({ product }: IProductCardProps) {
 	const isAvailable = product.quantity && Number(product.quantity) > 0;
 
 	const handleAddToCart = () => {
-		addToCart(product.productId, 1);
+		addToCart(product.productId!, 1);
 		toast.success(`${product.name} added to cart`);
 	};
 
@@ -35,7 +36,7 @@ function ProductCard({ product }: IProductCardProps) {
 					<div>
 						<Link
 							to="/product/$productId"
-							params={{ productId: product.productId.toString() }}
+							params={{ productId: product?.productId?.toString()! }}
 							className="hover:underline transition-all  ease-in-out duration-300 delay-300"
 						>
 							<CardTitle>{product.name}</CardTitle>
@@ -50,7 +51,7 @@ function ProductCard({ product }: IProductCardProps) {
 			<CardFooter className="flex items-center justify-between">
 				<div className="flex flex-col items-center justify-between">
 					<span className="font-bold">
-						{formatNumberToCurrency(product.price)}
+						{formatNumberToCurrency(Number(product?.price))}
 					</span>
 				</div>
 				<Button
