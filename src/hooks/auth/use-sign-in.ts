@@ -5,6 +5,7 @@ import { API_URL } from "@/lib/utils";
 import { signInMutation } from "@/generated/@tanstack/react-query.gen";
 import { LoginResponseDto } from "@/generated";
 import { setAuthUser } from "@/lib/auth-store";
+import { useNavigate } from "@tanstack/react-router";
 
 const UserRole = ["user", "seller"] as const;
 
@@ -70,16 +71,21 @@ async function signIn(
 // }
 
 export function useSignIn() {
+	const navigate = useNavigate(); 
 	return useMutation({
 		...signInMutation(),
 		onSuccess: (data: LoginResponseDto) => {
 			toast.success("User Signed in Successfully");
+
 			setAuthUser({
 				id: data?.id,
 				roles: data?.roles,
 				username: data?.username
 			}) 
 			console.log(data); 
+			navigate({
+				to: "/"
+			})
 		},
 		onError: (error: any) => {
 			console.error(`Error while Signing in | Error '${error.message}' ` ); 

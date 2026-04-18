@@ -10,6 +10,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cartItemCountStore } from "@/lib/cart-store";
+import { authStore } from "@/lib/auth-store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"; 
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useEffect, useState } from "react";
+import { Loader } from "./loader";
+import { UseSignOut } from "@/hooks/auth/use-sign-out";
 
 const navigationLinks = [
 	{ label: "Home", to: "/" },
@@ -25,6 +40,22 @@ const navigationLinks = [
 
 const Header = () => {
 	const cartItemCount = useStore(cartItemCountStore);
+	
+
+	const currentUserName = authStore?.state.user?.username; 
+	const { mutate } = UseSignOut(); 
+
+	const signout = () => {
+		mutate({}); 
+	}
+	
+
+
+	
+
+	
+
+	
 
 	return (
 		<header className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-xl">
@@ -76,9 +107,36 @@ const Header = () => {
 						<Button variant="ghost" size="icon" aria-label="Account">
 							<UserRound className="size-4" />
 						</Button>
-						<Button asChild className="hidden rounded-full px-5 sm:inline-flex">
+						{!currentUserName ? (
+							<Button asChild className="hidden rounded-full px-5 sm:inline-flex">
 							<Link to="/auth/sign-in">Sign In</Link>
 						</Button>
+						): (
+							<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    
+		<Avatar>
+  <AvatarImage src="" />
+  <AvatarFallback className="font-bold text-2xl">{currentUserName[0]}</AvatarFallback>
+</Avatar>
+	
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuGroup>
+      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Orders</DropdownMenuItem>
+	
+    </DropdownMenuGroup>
+    <DropdownMenuSeparator />
+      <DropdownMenuItem onClick={signout}>Sign Out</DropdownMenuItem>
+	
+   
+  </DropdownMenuContent>
+</DropdownMenu>
+
+						)}
+						
 					</div>
 				</div>
 

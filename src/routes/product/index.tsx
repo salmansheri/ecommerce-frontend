@@ -107,7 +107,8 @@ function Product() {
 					</div>
 				</div>
 
-				<div className="mt-8 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+				<div className="mt-8 
+				rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
 					<LoaderWrapper isLoading={isLoadingCategory || isProductsLoading}>
 						<div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
 							<p className="text-sm text-muted-foreground">

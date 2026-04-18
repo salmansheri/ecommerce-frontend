@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { API_URL } from "@/lib/utils";
 import { signUpMutation } from "@/generated/@tanstack/react-query.gen";
+import { useNavigate } from "@tanstack/react-router";
 
 const UserRole = ["user", "seller"] as const;
 
@@ -60,6 +61,7 @@ async function registerUser(
 
 
 export function useRegisterUser() {
+	const navigate = useNavigate(); 
 	return useMutation({
 		...signUpMutation(),
 		onError: (error) => {
@@ -69,6 +71,9 @@ export function useRegisterUser() {
 		onSuccess: (data) => {
 			console.log("Signup Mutation data " + data); 
 			toast.success("Successfully Registerd"); 
+			navigate({
+				to: "/auth/sign-in"
+			})
 		}
 	});
 }
