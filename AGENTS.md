@@ -159,3 +159,18 @@ Copilot instructions file status:
 - Ensure build is healthy for production-impacting changes.
 - Confirm no manual edits were made to generated route tree files.
 - Keep diffs minimal and aligned with nearby code patterns.
+
+## Runtime & Hooks Gotchas
+
+- TanStack Store hooks (`useStore`, `Derived`) must run in client components only. Using them in SSR shell/root components can cause `useRef is null` or `resolveDispatcher() is null` errors. If hooks fail in root layout/shell, use React's `useSyncExternalStore` instead.
+- Dev server port `42069` (TanStack devtools event bus) may be in use. Kill existing Vite process if `EADDRINUSE` error occurs.
+
+## Global Store Conventions
+
+- Use `@tanstack/store` (`Store`, `Derived`) for app-wide state (see `src/lib/cart-store.ts`, `src/lib/auth-store.ts`).
+- Pattern: create store, export it, optionally export a `Derived` for computed values, export setter helpers.
+- Always use hooks in leaf components; avoid calling store methods outside React component flow.
+
+## Header & Shell
+
+- Header component (`src/components/header.tsx`) is rendered in `src/routes/__root.tsx` shell. It lives outside route transitions.

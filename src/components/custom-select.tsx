@@ -9,9 +9,11 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import type { TCategory } from "@/lib/data/category";
+import { CategoryDto, CategoryResponseDto } from "@/generated";
+import { useEffect } from "react";
 
 interface CustomSelectProps {
-	data: any;
+	data?: CategoryDto[];
 	value: string;
 }
 
@@ -21,8 +23,17 @@ export function CustomSelect({ data, value }: CustomSelectProps) {
 	const handleValueChange = (category: string) => {
 		navigate({ search: { category: category } });
 	};
+
+	useEffect(() => {
+		if (!value && data?.length) {
+			navigate({
+				search:{ category: data[0].id?.toString()},
+				replace: true
+			})
+		}
+	})
 	return (
-		<Select value={value} onValueChange={handleValueChange}>
+		<Select value={value}  onValueChange={handleValueChange}>
 			<SelectTrigger className="w-40 sm:min-w-44">
 				<SelectValue placeholder="Select a Category" />
 			</SelectTrigger>
@@ -30,7 +41,7 @@ export function CustomSelect({ data, value }: CustomSelectProps) {
 				<SelectGroup>
 					<SelectLabel>Categories</SelectLabel>
 					{data?.map((category: any) => (
-						<SelectItem key={category.id} value={category.name}>
+						<SelectItem  key={category.id} value={category?.id}>
 							{category.name}
 						</SelectItem>
 					))}

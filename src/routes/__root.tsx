@@ -10,6 +10,7 @@ import { Toaster } from '@/components/ui/sonner';
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import StoreDevtools from '../lib/demo-store-devtools'
 import appCss from '../styles.css?url'; 
+import Header from '@/components/header';
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -48,6 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <main>
+          <Header />
         {children}
 
 

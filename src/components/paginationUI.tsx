@@ -6,11 +6,12 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "@/components/ui/pagination";
+import { ProductDto } from "@/generated";
 import type { TProduct } from "@/lib/data/product";
 import { useNavigate } from "@tanstack/react-router";
 
 interface PaginationUIProps {
-	products: TProduct[];
+	products: ProductDto[];
 	page: number;
 	pageSize: number;
 }

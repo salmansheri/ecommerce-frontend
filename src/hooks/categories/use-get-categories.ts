@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { TCategory } from "@/lib/data/category";
 import { API_URL } from "@/lib/utils";
+import { getAllCategoriesOptions } from "@/generated/@tanstack/react-query.gen";
 
 async function getCategories() {
 	const response = await fetch(
@@ -20,9 +21,13 @@ async function getCategories() {
 	return await response.json();
 }
 
+// export const useGetCategories = () => {
+// 	return useQuery({
+// 		queryKey: ["allCategories"],
+// 		queryFn: getCategories,
+// 	});
+// };
+
 export const useGetCategories = () => {
-	return useQuery({
-		queryKey: ["allCategories"],
-		queryFn: getCategories,
-	});
+	return useQuery(getAllCategoriesOptions());
 };

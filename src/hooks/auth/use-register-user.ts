@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as z from "zod";
 import { API_URL } from "@/lib/utils";
+import { signUpMutation } from "@/generated/@tanstack/react-query.gen";
+import { useNavigate } from "@tanstack/react-router";
 
 const UserRole = ["user", "seller"] as const;
 
@@ -43,16 +45,35 @@ async function registerUser(
 	return response.json();
 }
 
+// export function useRegisterUser() {
+// 	return useMutation({
+// 		mutationFn: registerUser,
+// 		onSuccess: (data) => {
+// 			toast.success("User Registered Successfully");
+// 			console.log(data);
+// 		},
+// 		onError: (error) => {
+// 			console.error(`Error while Registering User | Error '${error.message}' `);
+// 			toast.error(`Error while Registering User | Error '${error.message}' `);
+// 		},
+// 	});
+// }
+
+
 export function useRegisterUser() {
+	const navigate = useNavigate(); 
 	return useMutation({
-		mutationFn: registerUser,
-		onSuccess: (data) => {
-			toast.success("User Registered Successfully");
-			console.log(data);
-		},
+		...signUpMutation(),
 		onError: (error) => {
-			console.error(`Error while Registering User | Error '${error.message}' `);
-			toast.error(`Error while Registering User | Error '${error.message}' `);
-		},
+			console.log(error); 
+			toast.error("Error while Registering User | Error " + error.message)
+		}, 
+		onSuccess: (data) => {
+			console.log("Signup Mutation data " + data); 
+			toast.success("Successfully Registerd"); 
+			navigate({
+				to: "/auth/sign-in"
+			})
+		}
 	});
 }
