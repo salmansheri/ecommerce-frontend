@@ -1,9 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import {useMutation} from "@tanstack/react-query";
+import {toast} from "sonner";
 import * as z from "zod";
-import { API_URL } from "@/lib/utils";
-import { signUpMutation } from "@/generated/@tanstack/react-query.gen";
-import { useNavigate } from "@tanstack/react-router";
+import {signUpMutation} from "@/generated/@tanstack/react-query.gen";
+import {useNavigate} from "@tanstack/react-router";
 
 const UserRole = ["user", "seller"] as const;
 
@@ -24,26 +23,26 @@ export interface RegisterUserResponse {
 }
 
 
-async function registerUser(
-	input: RegisterUserInput,
-): Promise<RegisterUserResponse> {
-	const response = await fetch(`${API_URL}/auth/sign-up`, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(input),
-	});
-
-	if (!response.ok) {
-		const error = await response
-			.json()
-			.catch(() => ({ message: "Registration failed" }));
-		throw new Error(error.message);
-	}
-
-	return response.json();
-}
+// async function registerUser(
+// 	input: RegisterUserInput,
+// ): Promise<RegisterUserResponse> {
+// 	const response = await fetch(`${API_URL}/auth/sign-up`, {
+// 		method: "POST",
+// 		headers: {
+// 			"Content-Type": "application/json",
+// 		},
+// 		body: JSON.stringify(input),
+// 	});
+//
+// 	if (!response.ok) {
+// 		const error = await response
+// 			.json()
+// 			.catch(() => ({ message: "Registration failed" }));
+// 		throw new Error(error.message);
+// 	}
+//
+// 	return response.json();
+// }
 
 // export function useRegisterUser() {
 // 	return useMutation({

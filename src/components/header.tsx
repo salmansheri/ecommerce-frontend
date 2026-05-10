@@ -1,17 +1,10 @@
-import { Link } from "@tanstack/react-router";
-import { useStore } from "@tanstack/react-store";
-import {
-  Heart,
-  Loader2,
-  Search,
-  ShoppingBag,
-  ShoppingCart,
-  UserRound,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cartItemCountStore } from "@/lib/cart-store";
-import { authStore } from "@/lib/auth-store";
+import {Link} from "@tanstack/react-router";
+import {useStore} from "@tanstack/react-store";
+import {Heart, Search, ShoppingBag, ShoppingCart, UserRound,} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {cartItemCountStore} from "@/lib/cart-store";
+import {useAuth} from "@/lib/auth-store";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,12 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useEffect, useState } from "react";
-import { Loader } from "./loader";
-import { UseSignOut } from "@/hooks/auth/use-sign-out";
-import { userGetCurrentUserDetails } from "@/hooks/user/use-get-current-user-details";
-import { setAuthParams } from "@/generated/client/utils.gen";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {UseSignOut} from "@/hooks/auth/use-sign-out";
 
 const navigationLinks = [
   { label: "Home", to: "/" },
@@ -44,7 +33,9 @@ const navigationLinks = [
 const Header = () => {
   const cartItemCount = useStore(cartItemCountStore);
 
-  const currentUser = userGetCurrentUserDetails();
+  // const currentUser = userGetCurrentUserDetails();
+
+  const username = useAuth((state) => state.username);
 
   const { mutate } = UseSignOut();
 
@@ -102,11 +93,7 @@ const Header = () => {
             <Button variant="ghost" size="icon" aria-label="Account">
               <UserRound className="size-4" />
             </Button>
-            {currentUser.isLoading ? (
-              <div className="flex justify-center items-center">
-                <Loader2 className="animate-spin" />
-              </div>
-            ) : !currentUser?.data?.username ? (
+            {!username ? (
               <Button
                 asChild
                 className="hidden rounded-full px-5 sm:inline-flex"
@@ -119,7 +106,7 @@ const Header = () => {
                   <Avatar>
                     <AvatarImage src="" />
                     <AvatarFallback className="font-bold text-2xl">
-                      {currentUser?.data?.username[0]}
+                      {username[0]}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>

@@ -73,9 +73,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 			<CardContent>
 				<form
 					id={`${id}-signup-form`}
-					onSubmit={(event) => {
+					onSubmit={async (event) => {
 						event.preventDefault();
-						form.handleSubmit();
+						await form.handleSubmit();
 					}}
 				>
 					<FieldGroup>
