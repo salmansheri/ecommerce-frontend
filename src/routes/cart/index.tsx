@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useStore } from "@tanstack/react-store";
 import {
 	Minus,
 	Plus,
@@ -12,9 +11,9 @@ import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	addToCart,
-	cartStore,
 	removeFromCart,
 	setCartItemQuantity,
+	useCartStore,
 } from "@/lib/cart-store";
 import { products } from "@/lib/data/product";
 import { formatNumberToCurrency } from "@/lib/utils";
@@ -24,7 +23,7 @@ export const Route = createFileRoute("/cart/")({
 });
 
 function CartPage() {
-	const cartItems = useStore(cartStore, (state) => state.items);
+	const cartItems = useCartStore((state) => state.items);
 
 	const cartProducts = useMemo(() => {
 		return cartItems

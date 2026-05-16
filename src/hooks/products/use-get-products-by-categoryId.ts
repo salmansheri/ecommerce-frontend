@@ -1,5 +1,5 @@
-import { getProductsByCategoryOptions } from "@/generated/@tanstack/react-query.gen";
 import { useQuery } from "@tanstack/react-query";
+import { getProductsByCategoryOptions } from "@/generated/@tanstack/react-query.gen";
 
 export const useGetProductsByCategoryId = (categoryId: number, pageNumber: number, pageSize: number ) => {
 	

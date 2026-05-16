@@ -9,57 +9,6 @@ export type CategoryDto = {
     name?: string;
 };
 
-export type Address = {
-    addressId?: number;
-    street: string;
-    buildingName: string;
-    city: string;
-    state: string;
-    country: string;
-    pincode: string;
-    user?: User;
-};
-
-export type Cart = {
-    cartId?: number;
-    user?: User;
-    cartItems?: Array<CartItem>;
-    totalPrice?: number;
-};
-
-export type CartItem = {
-    cartItemId?: number;
-    cart?: Cart;
-    product?: Product;
-    quantity?: number;
-    discount?: number;
-    productPrice?: number;
-};
-
-export type Category = {
-    id?: number;
-    name: string;
-    products?: Array<Product>;
-    createdAt?: string;
-    updatedAt?: string;
-};
-
-export type Product = {
-    productId?: number;
-    name: string;
-    description: string;
-    quantity?: number;
-    price?: number;
-    specialPrice?: number;
-    imageUrl?: string;
-    discount?: number;
-    category?: Category;
-    createdAt?: string;
-    updatedAt?: string;
-    user?: User;
-    products?: Array<CartItem>;
-};
-
 export type ProductDto = {
     productId?: number;
     name?: string;
@@ -69,23 +18,6 @@ export type ProductDto = {
     specialPrice?: number;
     imageUrl?: string;
     discount?: number;
-    user?: User;
-};
-
-export type Role = {
-    roleId?: number;
-    roleName?: 'ROLE_ADMIN' | 'ROLE_USER' | 'ROLE_SELLER';
-};
-
-export type User = {
-    userId?: number;
-    username: string;
-    email: string;
-    password: string;
-    roles?: Array<Role>;
-    products?: Array<Product>;
-    addresses?: Array<Address>;
-    cart?: Cart;
 };
 
 export type CartDto = {
@@ -168,6 +100,7 @@ export type SignUpRequestDto = {
 };
 
 export type MessageResponseDto = {
+    success?: boolean;
     message?: string;
 };
 
@@ -548,6 +481,8 @@ export type GetProductsData = {
     body?: never;
     path?: never;
     query?: {
+        keyword?: string;
+        category?: string;
         pageNumber?: number;
         pageSize?: number;
         sortBy?: string;
@@ -565,7 +500,7 @@ export type GetProductsResponses = {
 
 export type GetProductsResponse = GetProductsResponses[keyof GetProductsResponses];
 
-export type GetProducts1Data = {
+export type GetProductData = {
     body?: never;
     path: {
         id: number;
@@ -574,14 +509,14 @@ export type GetProducts1Data = {
     url: '/api/v1/products/public/{id}';
 };
 
-export type GetProducts1Responses = {
+export type GetProductResponses = {
     /**
      * OK
      */
     200: ProductDto;
 };
 
-export type GetProducts1Response = GetProducts1Responses[keyof GetProducts1Responses];
+export type GetProductResponse = GetProductResponses[keyof GetProductResponses];
 
 export type GetProductsByKeywordData = {
     body?: never;

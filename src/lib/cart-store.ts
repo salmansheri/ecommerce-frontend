@@ -1,4 +1,4 @@
-import { Derived, Store } from "@tanstack/store";
+import { create } from "zustand";
 import { products } from "@/lib/data/product";
 
 export type TCartItem = {
@@ -16,69 +16,76 @@ const initialCartItems: TCartItem[] = products
 		quantity: index === 0 ? 1 : 2,
 	}));
 
-export const cartStore = new Store<{ items: TCartItem[] }>({
-	items: initialCartItems,
-});
+type CartStore = {
+	items: TCartItem[];
+	addToCart: (productId: number, quantity?: number) => void;
+	setCartItemQuantity: (productId: number, quantity: number) => void;
+	removeFromCart: (productId: number) => void;
+};
 
-export const cartItemCountStore = new Derived({
-	deps: [cartStore],
-	fn: () =>
-		cartStore.state.items.reduce((total, item) => total + item.quantity, 0),
-});
+export const useCartStore = create<CartStore>()((set) => ({
+	items: initialCartItems,
+	addToCart: (productId: number, quantity = 1) => {
+		if (quantity <= 0) return;
+
+		set((state) => {
+			const existingItem = state.items.find(
+				(item) => item.productId === productId,
+			);
+
+			if (!existingItem) {
+				return {
+					items: [
+						...state.items,
+						{ productId, quantity: Math.min(quantity, MAX_CART_QUANTITY) },
+					],
+				};
+			}
+
+			return {
+				items: state.items.map((item) =>
+					item.productId === productId
+						? {
+								...item,
+								quantity: Math.min(
+									item.quantity + quantity,
+									MAX_CART_QUANTITY,
+								),
+							}
+						: item,
+				),
+			};
+		});
+	},
+	setCartItemQuantity: (productId: number, quantity: number) => {
+		set((state) => ({
+			items: state.items
+				.map((item) =>
+					item.productId === productId
+						? {
+								...item,
+								quantity: Math.min(Math.max(quantity, 0), MAX_CART_QUANTITY),
+							}
+						: item,
+				)
+				.filter((item) => item.quantity > 0),
+		}));
+	},
+	removeFromCart: (productId: number) => {
+		set((state) => ({
+			items: state.items.filter((item) => item.productId !== productId),
+		}));
+	},
+}));
 
 export function addToCart(productId: number, quantity = 1) {
-	if (quantity <= 0) {
-		return;
-	}
-
-	cartStore.setState((state) => {
-		const existingItem = state.items.find(
-			(item) => item.productId === productId,
-		);
-
-		if (!existingItem) {
-			return {
-				...state,
-				items: [
-					...state.items,
-					{ productId, quantity: Math.min(quantity, MAX_CART_QUANTITY) },
-				],
-			};
-		}
-
-		return {
-			...state,
-			items: state.items.map((item) =>
-				item.productId === productId
-					? {
-							...item,
-							quantity: Math.min(item.quantity + quantity, MAX_CART_QUANTITY),
-						}
-					: item,
-			),
-		};
-	});
+	useCartStore.getState().addToCart(productId, quantity);
 }
 
 export function setCartItemQuantity(productId: number, quantity: number) {
-	cartStore.setState((state) => ({
-		...state,
-		items: state.items
-			.map((item) =>
-				item.productId === productId
-					? {
-							...item,
-							quantity: Math.min(Math.max(quantity, 0), MAX_CART_QUANTITY),
-						}
-					: item,
-			)
-			.filter((item) => item.quantity > 0),
-	}));
+	useCartStore.getState().setCartItemQuantity(productId, quantity);
 }
 
 export function removeFromCart(productId: number) {
-	cartStore.setState((state) => ({
-		...state,
-		items: state.items.filter((item) => item.productId !== productId),
-	}));
+	useCartStore.getState().removeFromCart(productId);
 }

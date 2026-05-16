@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import {LoginResponseDto} from "@/generated";
+import type {LoginResponseDto} from "@/generated";
 
 type AuthStore = {
     id: number | null,

@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+
 import {
 	Select,
 	SelectContent,
@@ -8,9 +9,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import type { TCategory } from "@/lib/data/category";
-import { CategoryDto, CategoryResponseDto } from "@/generated";
-import { useEffect } from "react";
+import type { CategoryDto, } from "@/generated";
 
 interface CustomSelectProps {
 	data?: CategoryDto[];
@@ -24,24 +23,18 @@ export function CustomSelect({ data, value }: CustomSelectProps) {
 		navigate({ search: { category: category } });
 	};
 
-	useEffect(() => {
-		if (!value && data?.length) {
-			navigate({
-				search:{ category: data[0].id?.toString()},
-				replace: true
-			})
-		}
-	})
+
 	return (
-		<Select value={value}  onValueChange={handleValueChange}>
+		<Select value={value === "all" ? "" : value} onValueChange={handleValueChange}>
 			<SelectTrigger className="w-40 sm:min-w-44">
-				<SelectValue placeholder="Select a Category" />
+				<SelectValue placeholder="Select Category"  />
 			</SelectTrigger>
 			<SelectContent>
 				<SelectGroup>
 					<SelectLabel>Categories</SelectLabel>
-					{data?.map((category: any) => (
-						<SelectItem  key={category.id} value={category?.id}>
+
+					{data?.map((category: CategoryDto) => (
+						<SelectItem key={category.id} value={category?.name ?? ""}>
 							{category.name}
 						</SelectItem>
 					))}

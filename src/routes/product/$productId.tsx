@@ -11,8 +11,9 @@ import {
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { addToCart } from "@/lib/cart-store";
-import { products } from "@/lib/data/product";
 import { formatNumberToCurrency, formatNumberToPercentage } from "@/lib/utils";
+import {useGetProductById} from "@/hooks/products/use-get-product-by-id.ts";
+import {Loader} from "@/components/loader.tsx";
 
 export const Route = createFileRoute("/product/$productId")({
 	component: RouteComponent,
@@ -20,7 +21,9 @@ export const Route = createFileRoute("/product/$productId")({
 
 function RouteComponent() {
 	const { productId } = Route.useParams();
-	const product = products.find((item) => item.productId === Number(productId));
+
+	const { data: product, isLoading } = useGetProductById(Number(productId));
+
 
 	if (!product) {
 		return (
@@ -43,10 +46,10 @@ function RouteComponent() {
 		);
 	}
 
-	const isAvailable = product.quantity > 0;
+	const isAvailable = (product.quantity ?? 0) > 0;
 	const originalPrice =
-		product.discount > 0
-			? product.price / (1 - product.discount / 100)
+		(product.discount ?? 0) > 0
+			? (product.price ?? 0) / (1 - (product.discount ?? 0) / 100)
 			: product.price;
 	const highlights = [
 		"Genuine quality checked product",
@@ -56,9 +59,18 @@ function RouteComponent() {
 	const previewTiles = [1, 2, 3, 4];
 
 	const handleAddToCart = () => {
-		addToCart(product.productId, 1);
+		addToCart((product.productId ?? 0), 1);
 		toast.success(`${product.name} added to cart`);
 	};
+
+	if (isLoading) {
+		return (
+			<div className="min-h-screen flex justify-center items-center">
+				<Loader />
+
+			</div>
+		)
+	}
 
 	return (
 		<section className="bg-gradient-to-b from-background to-muted/30 px-4 py-10 sm:px-8 lg:px-14 lg:py-14">
@@ -106,8 +118,8 @@ function RouteComponent() {
 					<div className="space-y-6">
 						<div className="flex flex-wrap items-center gap-3">
 							<span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">
-								{product.discount > 0
-									? `${formatNumberToPercentage(product.discount)} Off`
+								{(product.discount ?? 0) > 0
+									? `${formatNumberToPercentage(product.discount ?? 0)} Off`
 									: "Featured"}
 							</span>
 							<div className="flex items-center gap-1 text-amber-500">
@@ -133,15 +145,15 @@ function RouteComponent() {
 						<div className="rounded-2xl border bg-card p-5 shadow-sm">
 							<div className="flex flex-wrap items-center gap-3">
 								<p className="text-3xl font-bold sm:text-4xl">
-									{formatNumberToCurrency(product.price)}
+									{formatNumberToCurrency(product.price ?? 0)}
 								</p>
-								{product.discount > 0 && (
+								{(product.discount ?? 0) > 0 && (
 									<>
 										<p className="text-lg text-muted-foreground line-through">
-											{formatNumberToCurrency(originalPrice)}
+											{formatNumberToCurrency(originalPrice ?? 0)}
 										</p>
 										<span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-											Save {formatNumberToPercentage(product.discount)}
+											Save {formatNumberToPercentage(product.discount ?? 0)}
 										</span>
 									</>
 								)}
@@ -221,7 +233,7 @@ function RouteComponent() {
 									Discount
 								</p>
 								<p className="mt-1 text-sm font-semibold">
-									{formatNumberToPercentage(product.discount)}
+									{formatNumberToPercentage(product.discount ?? 0)}
 								</p>
 							</div>
 							<div className="rounded-xl border bg-background/70 p-4">

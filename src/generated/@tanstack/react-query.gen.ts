@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { createAddress, createCart, createCategory, createProduct, deleteAddressById, deleteCategory, deleteProduct, deleteProductFromCart, getAddressById, getAllAddresses, getAllCarts, getAllCategories, getCarById, getCurrentUserDetails, getCurrentUserName, getProducts, getProducts1, getProductsByCategory, getProductsByKeyword, getUserAddress, type Options, orderProducts, signIn, signOut, signUp, updateAddressById, updateCartProduct, updateCategory, updateProduct, updateProductImage } from '../sdk.gen';
-import type { CreateAddressData, CreateAddressResponse, CreateCartData, CreateCartResponse, CreateCategoryData, CreateCategoryResponse, CreateProductData, CreateProductResponse, DeleteAddressByIdData, DeleteAddressByIdResponse, DeleteCategoryData, DeleteCategoryResponse, DeleteProductData, DeleteProductFromCartData, DeleteProductFromCartResponse, DeleteProductResponse, GetAddressByIdData, GetAddressByIdResponse, GetAllAddressesData, GetAllAddressesResponse, GetAllCartsData, GetAllCartsResponse, GetAllCategoriesData, GetAllCategoriesResponse, GetCarByIdData, GetCarByIdResponse, GetCurrentUserDetailsData, GetCurrentUserDetailsResponse, GetCurrentUserNameData, GetCurrentUserNameResponse, GetProducts1Data, GetProducts1Response, GetProductsByCategoryData, GetProductsByCategoryResponse, GetProductsByKeywordData, GetProductsByKeywordResponse, GetProductsData, GetProductsResponse, GetUserAddressData, GetUserAddressResponse, OrderProductsData, OrderProductsResponse, SignInData, SignInResponse, SignOutData, SignOutResponse, SignUpData, SignUpResponse, UpdateAddressByIdData, UpdateAddressByIdResponse, UpdateCartProductData, UpdateCartProductResponse, UpdateCategoryData, UpdateCategoryResponse, UpdateProductData, UpdateProductImageData, UpdateProductImageResponse, UpdateProductResponse } from '../types.gen';
+import { createAddress, createCart, createCategory, createProduct, deleteAddressById, deleteCategory, deleteProduct, deleteProductFromCart, getAddressById, getAllAddresses, getAllCarts, getAllCategories, getCarById, getCurrentUserDetails, getCurrentUserName, getProduct, getProducts, getProductsByCategory, getProductsByKeyword, getUserAddress, type Options, orderProducts, signIn, signOut, signUp, updateAddressById, updateCartProduct, updateCategory, updateProduct, updateProductImage } from '../sdk.gen';
+import type { CreateAddressData, CreateAddressResponse, CreateCartData, CreateCartResponse, CreateCategoryData, CreateCategoryResponse, CreateProductData, CreateProductResponse, DeleteAddressByIdData, DeleteAddressByIdResponse, DeleteCategoryData, DeleteCategoryResponse, DeleteProductData, DeleteProductFromCartData, DeleteProductFromCartResponse, DeleteProductResponse, GetAddressByIdData, GetAddressByIdResponse, GetAllAddressesData, GetAllAddressesResponse, GetAllCartsData, GetAllCartsResponse, GetAllCategoriesData, GetAllCategoriesResponse, GetCarByIdData, GetCarByIdResponse, GetCurrentUserDetailsData, GetCurrentUserDetailsResponse, GetCurrentUserNameData, GetCurrentUserNameResponse, GetProductData, GetProductResponse, GetProductsByCategoryData, GetProductsByCategoryResponse, GetProductsByKeywordData, GetProductsByKeywordResponse, GetProductsData, GetProductsResponse, GetUserAddressData, GetUserAddressResponse, OrderProductsData, OrderProductsResponse, SignInData, SignInResponse, SignOutData, SignOutResponse, SignUpData, SignUpResponse, UpdateAddressByIdData, UpdateAddressByIdResponse, UpdateCartProductData, UpdateCartProductResponse, UpdateCategoryData, UpdateCategoryResponse, UpdateProductData, UpdateProductImageData, UpdateProductImageResponse, UpdateProductResponse } from '../types.gen';
 
 export const updateCategoryMutation = (options?: Partial<Options<UpdateCategoryData>>): UseMutationOptions<UpdateCategoryResponse, DefaultError, Options<UpdateCategoryData>> => {
     const mutationOptions: UseMutationOptions<UpdateCategoryResponse, DefaultError, Options<UpdateCategoryData>> = {
@@ -314,11 +314,11 @@ export const getProductsOptions = (options?: Options<GetProductsData>) => queryO
     queryKey: getProductsQueryKey(options)
 });
 
-export const getProducts1QueryKey = (options: Options<GetProducts1Data>) => createQueryKey('getProducts1', options);
+export const getProductQueryKey = (options: Options<GetProductData>) => createQueryKey('getProduct', options);
 
-export const getProducts1Options = (options: Options<GetProducts1Data>) => queryOptions<GetProducts1Response, DefaultError, GetProducts1Response, ReturnType<typeof getProducts1QueryKey>>({
+export const getProductOptions = (options: Options<GetProductData>) => queryOptions<GetProductResponse, DefaultError, GetProductResponse, ReturnType<typeof getProductQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getProducts1({
+        const { data } = await getProduct({
             ...options,
             ...queryKey[0],
             signal,
@@ -326,7 +326,7 @@ export const getProducts1Options = (options: Options<GetProducts1Data>) => query
         });
         return data;
     },
-    queryKey: getProducts1QueryKey(options)
+    queryKey: getProductQueryKey(options)
 });
 
 export const getProductsByKeywordQueryKey = (options: Options<GetProductsByKeywordData>) => createQueryKey('getProductsByKeyword', options);

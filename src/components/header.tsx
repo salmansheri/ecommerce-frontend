@@ -1,9 +1,8 @@
 import {Link} from "@tanstack/react-router";
-import {useStore} from "@tanstack/react-store";
 import {Heart, Search, ShoppingBag, ShoppingCart, UserRound,} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {cartItemCountStore} from "@/lib/cart-store";
+import {useCartStore} from "@/lib/cart-store";
 import {useAuth} from "@/lib/auth-store";
 import {
   DropdownMenu,
@@ -31,7 +30,9 @@ const navigationLinks = [
 ] as const;
 
 const Header = () => {
-  const cartItemCount = useStore(cartItemCountStore);
+  const cartItemCount = useCartStore((state) =>
+	state.items.reduce((total, item) => total + item.quantity, 0),
+);
 
   // const currentUser = userGetCurrentUserDetails();
 

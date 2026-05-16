@@ -1,23 +1,28 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { zodValidator } from "@tanstack/zod-adapter";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+
+import { ArrowDown, ArrowDownUp, ArrowUp, CheckIcon } from "lucide-react";
 import z from "zod";
 import { CustomSelect } from "@/components/custom-select";
 import { LoaderWrapper } from "@/components/loader-wrapper";
 import { PaginationUI } from "@/components/paginationUI";
-import ProductCard from "@/components/productCard";
-import { useGetCategories } from "@/hooks/categories/use-get-categories";
-
-import { products } from "@/lib/data/product";
-import { useState } from "react";
-import { useGetProductsByCategoryId } from "@/hooks/products/use-get-products-by-categoryId";
-import { ca } from "zod/v4/locales";
 import Products from "@/components/products";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useGetCategories } from "@/hooks/categories/use-get-categories";
+import {useGetProducts} from "@/hooks/products/use-get-products.ts";
 
 const productSearchSchema = z.object({
-	page: z.number().default(1),
+	page: z.number().default(0),
 	category: z.string().default(""),
 	sortBy: z.string().default(""),
 	sortOrder: z.string().default(""),
+	keyword: z.string().default("")
 });
 
 export const Route = createFileRoute("/product/")({
@@ -25,35 +30,97 @@ export const Route = createFileRoute("/product/")({
 	loader: () => {
 		// throw new Error("Some went wrong")
 	},
-	validateSearch: zodValidator(productSearchSchema),
+	validateSearch: productSearchSchema,
 });
 
+const sortOptions = [
+	{ label: "Name (A-Z)", value: "name", order: "asc" },
+	{ label: "Name (Z-A)", value: "name", order: "desc" },
+	{ label: "Price: Low to High", value: "price", order: "asc" },
+	{ label: "Price: High to Low", value: "price", order: "desc" },
+	{ label: "Newest First", value: "createdAt", order: "desc" },
+	{ label: "Oldest First", value: "createdAt", order: "asc" },
+];
+
+
+
+function SortButton() {
+	const { sortBy, sortOrder } = Route.useSearch();
+	const navigate = useNavigate({ from: "/product" });
+
+	const activeOption = sortOptions.find(
+		(o) => o.value === sortBy && o.order === sortOrder,
+	);
+
+	const SortIcon =
+		!sortBy || !sortOrder
+			? ArrowDownUp
+			: sortOrder === "asc"
+				? ArrowUp
+				: ArrowDown;
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-xl border bg-background/70 px-4 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring/50">
+				<SortIcon className="size-4" />
+				<span className="hidden sm:inline">
+					{activeOption ? activeOption.label : "Sort by"}
+				</span>
+				<span className="sm:hidden">{activeOption ? "Sorted" : "Sort"}</span>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="w-52">
+				<DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+					Sort Products
+				</DropdownMenuLabel>
+				<DropdownMenuSeparator />
+				{sortOptions.map((option) => {
+					const isActive =
+						activeOption?.value === option.value &&
+						activeOption?.order === option.order;
+					return (
+						<DropdownMenuItem
+							key={`${option.value}-${option.order}`}
+							className="cursor-pointer"
+							onClick={() =>
+								navigate({
+									search: { sortBy: option.value, sortOrder: option.order },
+								})
+							}
+						>
+							<span className="flex-1">{option.label}</span>
+							{isActive && <CheckIcon className="size-4 text-primary" />}
+						</DropdownMenuItem>
+					);
+				})}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
+
 function Product() {
-	const { page, category } = Route.useSearch();
-	
+	const { page, category, sortOrder, sortBy, keyword } = Route.useSearch();
+	console.log("Category: ", category);
+
 	const pageSize = 10;
 
-	const { data: products, isLoading: isProductsLoading } = useGetProductsByCategoryId(Number(category), page, pageSize); 
-	const { data: categories, isLoading: isLoadingCategory} = useGetCategories(); 
+	const { data: products, isLoading: isProductsLoading } =
+		useGetProducts(page, pageSize, sortBy, sortOrder, keyword, category);
+	const { data: categories, isLoading: isLoadingCategory } = useGetCategories();
 
-	const categoryList = categories?.data ?? []; 
+	const categoryList = categories?.data ?? [];
 
-	const productList = products?.data ?? []; 
+	const productList = products?.data ?? [];
 	const totalProducts = productList.length;
-	
+
 	const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize));
 	const safePage = Math.min(Math.max(1, page), totalPages);
 	const startIndex = (safePage - 1) * pageSize;
 	const endIndex = Math.min(startIndex + pageSize, totalProducts);
-	
+
 	const visibleProducts = productList.slice(startIndex, endIndex);
 
-	
-
-	
-
 	return (
-		<section className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 px-4 py-10 sm:px-8 lg:px-14 lg:py-14">
+		<section className="min-h-screen bg-linear-to-b from-background via-background to-muted/30 px-4 py-10 sm:px-8 lg:px-14 lg:py-14">
 			<div className="mx-auto max-w-7xl">
 				<div className="rounded-3xl border bg-card/70 p-6 shadow-sm backdrop-blur sm:p-8">
 					<p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -95,20 +162,23 @@ function Product() {
 					</div>
 					<div className="flex flex-col items-center gap-3">
 						<CustomSelect value={category} data={categories?.data} />
+						<SortButton />
 						{category ? (
-							<span className="min-w-[110px] rounded-full border bg-muted px-3 py-1 text-center text-xs font-medium text-muted-foreground">
+							<span className="min-w-27.5 rounded-full border bg-muted px-3 py-1 text-center text-xs font-medium text-muted-foreground">
 								Category: {category}
 							</span>
 						) : (
-							<span className="min-w-[110px] rounded-full border bg-muted px-3 py-1 text-center text-xs font-medium text-muted-foreground">
+							<span className="min-w-27.5 rounded-full border bg-muted px-3 py-1 text-center text-xs font-medium text-muted-foreground">
 								All categories
 							</span>
 						)}
 					</div>
 				</div>
 
-				<div className="mt-8 
-				rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+				<div
+					className="mt-8 
+				rounded-3xl border bg-card p-5 shadow-sm sm:p-6"
+				>
 					<LoaderWrapper isLoading={isLoadingCategory || isProductsLoading}>
 						<div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
 							<p className="text-sm text-muted-foreground">
