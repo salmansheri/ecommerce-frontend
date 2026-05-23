@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { useCreateCart } from "@/hooks/cart/use-create-cart";
+import { mapCartToItems, useGetCartItems } from "@/hooks/cart/use-get-cart-items";
 import {
 	addToCart,
 	removeFromCart,
@@ -23,31 +25,10 @@ export const Route = createFileRoute("/cart/")({
 });
 
 function CartPage() {
+	const { data: cart } = useGetCartItems();
 	const cartItems = useCartStore((state) => state.items);
-
-	const cartProducts = useMemo(() => {
-		return cartItems
-			.map((item) => {
-				const product = products.find(
-					(candidateProduct) => candidateProduct.productId === item.productId,
-				);
-
-				if (!product) {
-					return null;
-				}
-
-				const baseAmount = product.price * item.quantity;
-				const discountAmount = (baseAmount * product.discount) / 100;
-
-				return {
-					product,
-					quantity: item.quantity,
-					baseAmount,
-					discountAmount,
-				};
-			})
-			.filter((item) => item !== null);
-	}, [cartItems]);
+	const cartProducts = mapCartToItems(cart);
+	const { mutate: createCart } = useCreateCart();
 
 	const pricing = useMemo(() => {
 		const subtotal = cartProducts.reduce(
@@ -67,6 +48,7 @@ function CartPage() {
 
 	const increaseQuantity = (productId: number) => {
 		addToCart(productId, 1);
+		createCart({ path: { productId, quantity: 1 } });
 	};
 
 	const decreaseQuantity = (productId: number) => {
@@ -132,13 +114,13 @@ function CartPage() {
 						) : (
 							cartProducts.map((item) => (
 								<article
-									key={item.product.productId}
+									key={item.productId}
 									className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:p-5"
 								>
 									<div className="flex flex-col gap-4 sm:flex-row sm:items-start">
 										<img
-											src={item.product.imageUrl}
-											alt={item.product.name}
+											src={item.imageUrl}
+											alt={item.name}
 											className="h-28 w-full rounded-xl border border-border/70 object-cover sm:w-36"
 										/>
 
@@ -148,14 +130,14 @@ function CartPage() {
 													<Link
 														to="/product/$productId"
 														params={{
-															productId: item.product.productId.toString(),
+															productId: item.productId.toString(),
 														}}
 														className="text-base font-semibold tracking-tight hover:underline"
 													>
-														{item.product.name}
+														{item.name}
 													</Link>
 													<p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-														{item.product.description}
+														{item.description}
 													</p>
 												</div>
 												<div className="text-right">
@@ -176,7 +158,7 @@ function CartPage() {
 														variant="ghost"
 														size="icon-sm"
 														onClick={() =>
-															decreaseQuantity(item.product.productId)
+															decreaseQuantity(item.productId)
 														}
 														aria-label="Decrease quantity"
 													>
@@ -189,7 +171,7 @@ function CartPage() {
 														variant="ghost"
 														size="icon-sm"
 														onClick={() =>
-															increaseQuantity(item.product.productId)
+															increaseQuantity(item.productId)
 														}
 														aria-label="Increase quantity"
 													>
@@ -199,7 +181,7 @@ function CartPage() {
 												<Button
 													variant="ghost"
 													size="sm"
-													onClick={() => removeItem(item.product.productId)}
+													onClick={() => removeItem(item.productId)}
 													className="text-muted-foreground hover:text-destructive"
 												>
 													<Trash2 className="size-4" />

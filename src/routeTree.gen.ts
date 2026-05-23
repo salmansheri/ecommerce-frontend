@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as ProductIndexRouteImport } from './routes/product/index'
 import { Route as CartIndexRouteImport } from './routes/cart/index'
 import { Route as ProductProductIdRouteImport } from './routes/product/$productId'
@@ -32,6 +33,11 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchIndexRoute = SearchIndexRouteImport.update({
+  id: '/search/',
+  path: '/search/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductIndexRoute = ProductIndexRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/product/$productId': typeof ProductProductIdRoute
   '/cart': typeof CartIndexRoute
   '/product': typeof ProductIndexRoute
+  '/search': typeof SearchIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/product/$productId': typeof ProductProductIdRoute
   '/cart': typeof CartIndexRoute
   '/product': typeof ProductIndexRoute
+  '/search': typeof SearchIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/product/$productId': typeof ProductProductIdRoute
   '/cart/': typeof CartIndexRoute
   '/product/': typeof ProductIndexRoute
+  '/search/': typeof SearchIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/product/$productId'
     | '/cart'
     | '/product'
+    | '/search'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/product/$productId'
     | '/cart'
     | '/product'
+    | '/search'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/product/$productId'
     | '/cart/'
     | '/product/'
+    | '/search/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   ProductProductIdRoute: typeof ProductProductIdRoute
   CartIndexRoute: typeof CartIndexRoute
   ProductIndexRoute: typeof ProductIndexRoute
+  SearchIndexRoute: typeof SearchIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search/': {
+      id: '/search/'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/': {
@@ -423,6 +443,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductProductIdRoute: ProductProductIdRoute,
   CartIndexRoute: CartIndexRoute,
   ProductIndexRoute: ProductIndexRoute,
+  SearchIndexRoute: SearchIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { products } from "@/lib/data/product";
 
 export type TCartItem = {
@@ -23,8 +24,10 @@ type CartStore = {
 	removeFromCart: (productId: number) => void;
 };
 
-export const useCartStore = create<CartStore>()((set) => ({
-	items: initialCartItems,
+export const useCartStore = create<CartStore>()(
+	persist(
+		(set) => ({
+			items: initialCartItems,
 	addToCart: (productId: number, quantity = 1) => {
 		if (quantity <= 0) return;
 
@@ -76,7 +79,12 @@ export const useCartStore = create<CartStore>()((set) => ({
 			items: state.items.filter((item) => item.productId !== productId),
 		}));
 	},
-}));
+		}),
+		{
+			name: "cart-store",
+		},
+	),
+);
 
 export function addToCart(productId: number, quantity = 1) {
 	useCartStore.getState().addToCart(productId, quantity);

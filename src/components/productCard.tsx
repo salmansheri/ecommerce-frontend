@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import type { ProductDto } from "@/generated";
+import { useCreateCart } from "@/hooks/cart/use-create-cart";
 import { addToCart } from "@/lib/cart-store";
-import type { TProduct } from "@/lib/data/product";
 import { formatNumberToCurrency } from "@/lib/utils";
 import { Button } from "./ui/button";
 import {
@@ -13,16 +14,17 @@ import {
 	CardHeader,
 	CardTitle,
 } from "./ui/card";
-import { ProductDto } from "@/generated";
 
 interface IProductCardProps {
 	product: ProductDto;
 }
 function ProductCard({ product }: IProductCardProps) {
+	const { mutate: createCart } = useCreateCart();
 	const isAvailable = product.quantity && Number(product.quantity) > 0;
 
 	const handleAddToCart = () => {
 		addToCart(product.productId!, 1);
+		createCart({ path: { productId: product.productId!, quantity: 1 } });
 		toast.success(`${product.name} added to cart`);
 	};
 

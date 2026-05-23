@@ -1,7 +1,6 @@
 import {Link} from "@tanstack/react-router";
-import {Heart, Search, ShoppingBag, ShoppingCart, UserRound,} from "lucide-react";
+import {Heart, ShoppingBag, ShoppingCart, UserRound,} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
 import {useCartStore} from "@/lib/cart-store";
 import {useAuth} from "@/lib/auth-store";
 import {
@@ -16,6 +15,7 @@ import {
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {UseSignOut} from "@/hooks/auth/use-sign-out";
+import { SearchSuggestions } from "@/components/search-suggestions";
 
 const navigationLinks = [
   { label: "Home", to: "/" },
@@ -68,12 +68,7 @@ const Header = () => {
 
           <div className="hidden flex-1 px-3 lg:block">
             <div className="relative mx-auto max-w-md">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search products, brands, categories..."
-                className="h-10 rounded-full border-border/70 bg-card pl-9 pr-4"
-              />
+              <SearchSuggestions placeholder="Search products, brands, categories..." />
             </div>
           </div>
 
@@ -149,12 +144,7 @@ const Header = () => {
 
         <div className="grid gap-3 md:hidden">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search catalog"
-              className="h-10 rounded-full border-border/70 bg-card pl-9"
-            />
+            <SearchSuggestions placeholder="Search catalog" mobile />
           </div>
           <nav className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {navigationLinks.map((item) => (
