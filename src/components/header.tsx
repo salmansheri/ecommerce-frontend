@@ -1,4 +1,4 @@
-import {Link} from "@tanstack/react-router";
+import {Link, useNavigate} from "@tanstack/react-router";
 import {Heart, ShoppingBag, ShoppingCart, UserRound,} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {useCartStore} from "@/lib/cart-store";
@@ -35,8 +35,12 @@ const Header = () => {
 );
 
   // const currentUser = userGetCurrentUserDetails();
+  const navigate = useNavigate();
 
   const username = useAuth((state) => state.username);
+  const userRoles = useAuth((state) => state.roles);
+  const isAdmin = userRoles?.includes("ROLE_ADMIN");
+// const isAdmin = true;
 
   const { mutate } = UseSignOut();
 
@@ -109,8 +113,13 @@ const Header = () => {
                 <DropdownMenuContent>
                   <DropdownMenuGroup>
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate({to: "/settings"})}>Settings</DropdownMenuItem>
                     <DropdownMenuItem>Orders</DropdownMenuItem>
+                    {isAdmin && (
+                        <DropdownMenuItem onClick={() => navigate({ to: "/admin"})}>Admin Panel</DropdownMenuItem>
+
+
+                    )}
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signout}>
