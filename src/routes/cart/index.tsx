@@ -10,14 +10,18 @@ import {
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useCreateCart } from "@/hooks/cart/use-create-cart";
-import { mapCartToItems, useGetCartItems } from "@/hooks/cart/use-get-cart-items";
+import {
+	mapCartToItems,
+	useGetCartItems,
+} from "@/hooks/cart/use-get-cart-items";
+import { useRemoveCartItem } from "@/hooks/cart/use-remove-cart-item";
+import { useGetProducts } from "@/hooks/products/use-get-products";
 import {
 	addToCart,
 	removeFromCart,
 	setCartItemQuantity,
 	useCartStore,
 } from "@/lib/cart-store";
-import { products } from "@/lib/data/product";
 import { formatNumberToCurrency } from "@/lib/utils";
 
 export const Route = createFileRoute("/cart/")({
@@ -26,9 +30,18 @@ export const Route = createFileRoute("/cart/")({
 
 function CartPage() {
 	const { data: cart } = useGetCartItems();
+	const { data: productsResponse } = useGetProducts(0, 20, "", "");
 	const cartItems = useCartStore((state) => state.items);
 	const cartProducts = mapCartToItems(cart);
+	const recommendedProducts = useMemo(() => {
+		const allProducts = productsResponse?.data ?? [];
+		const cartProductIds = new Set(cartProducts.map((item) => item.productId));
+		return allProducts
+			.filter((product) => !cartProductIds.has(product.productId ?? -1))
+			.slice(0, 4);
+	}, [productsResponse?.data, cartProducts]);
 	const { mutate: createCart } = useCreateCart();
+	const { mutate: removeCartItem } = useRemoveCartItem();
 
 	const pricing = useMemo(() => {
 		const subtotal = cartProducts.reduce(
@@ -39,7 +52,8 @@ function CartPage() {
 			(total, item) => total + item.discountAmount,
 			0,
 		);
-		const shipping = subtotal - discount >= 2500 ? 0 : 99;
+		const netAmount = subtotal - discount;
+		const shipping = netAmount <= 0 ? 0 : netAmount >= 2500 ? 0 : 99;
 		const tax = (subtotal - discount) * 0.05;
 		const total = subtotal - discount + tax + shipping;
 
@@ -62,7 +76,18 @@ function CartPage() {
 	};
 
 	const removeItem = (productId: number) => {
-		removeFromCart(productId);
+		const cartId = cart?.cartId;
+		if (!cartId) {
+			removeFromCart(productId);
+			return;
+		}
+
+		removeCartItem({
+			path: {
+				cartId,
+				productId,
+			},
+		});
 	};
 
 	return (
@@ -157,9 +182,7 @@ function CartPage() {
 													<Button
 														variant="ghost"
 														size="icon-sm"
-														onClick={() =>
-															decreaseQuantity(item.productId)
-														}
+														onClick={() => decreaseQuantity(item.productId)}
 														aria-label="Decrease quantity"
 													>
 														<Minus className="size-3.5" />
@@ -170,9 +193,7 @@ function CartPage() {
 													<Button
 														variant="ghost"
 														size="icon-sm"
-														onClick={() =>
-															increaseQuantity(item.productId)
-														}
+														onClick={() => increaseQuantity(item.productId)}
 														aria-label="Increase quantity"
 													>
 														<Plus className="size-3.5" />
@@ -200,18 +221,20 @@ function CartPage() {
 									You might also like
 								</h3>
 								<div className="mt-4 grid gap-3 sm:grid-cols-2">
-									{products.slice(8, 12).map((product) => (
+									{recommendedProducts.map((product) => (
 										<Link
 											key={product.productId}
 											to="/product/$productId"
-											params={{ productId: product.productId.toString() }}
+											params={{
+												productId: product.productId?.toString() ?? "0",
+											}}
 											className="rounded-xl border border-border/70 bg-background/70 p-3 transition-colors hover:bg-accent"
 										>
 											<p className="line-clamp-1 text-sm font-medium">
 												{product.name}
 											</p>
 											<p className="mt-1 text-xs text-muted-foreground">
-												{formatNumberToCurrency(product.price)}
+												{formatNumberToCurrency(product.price ?? 0)}
 											</p>
 										</Link>
 									))}

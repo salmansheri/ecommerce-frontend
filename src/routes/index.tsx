@@ -10,19 +10,24 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { products } from "@/lib/data/product";
+import { useGetProducts } from "@/hooks/products/use-get-products";
 import { formatNumberToCurrency, formatNumberToPercentage } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: App });
-
-const trendingProducts = products.slice(0, 4);
-const spotlightProducts = products.slice(6, 9);
-const heroSlides = products.slice(3, 8);
+const trendingSkeletonKeys = ["t-1", "t-2", "t-3", "t-4"] as const;
+const spotlightSkeletonKeys = ["s-1", "s-2", "s-3"] as const;
 
 function App() {
 	const [currentSlide, setCurrentSlide] = useState(0);
+	const { data: productsResponse, isLoading } = useGetProducts(0, 20, "", "");
+	const products = productsResponse?.data ?? [];
+	const trendingProducts = products.slice(0, 4);
+	const spotlightProducts = products.slice(6, 9);
+	const heroSlides = products.slice(3, 8);
 
 	useEffect(() => {
+		if (heroSlides.length === 0) return;
+
 		const interval = window.setInterval(() => {
 			setCurrentSlide(
 				(previousSlide) => (previousSlide + 1) % heroSlides.length,
@@ -30,15 +35,19 @@ function App() {
 		}, 5000);
 
 		return () => window.clearInterval(interval);
-	}, []);
+	}, [heroSlides.length]);
 
 	const showPreviousSlide = () => {
+		if (heroSlides.length === 0) return;
+
 		setCurrentSlide((previousSlide) =>
 			previousSlide === 0 ? heroSlides.length - 1 : previousSlide - 1,
 		);
 	};
 
 	const showNextSlide = () => {
+		if (heroSlides.length === 0) return;
+
 		setCurrentSlide((previousSlide) => (previousSlide + 1) % heroSlides.length);
 	};
 
@@ -112,39 +121,53 @@ function App() {
 
 					<div className="rounded-2xl border border-border/70 bg-background/70 p-4">
 						<div className="relative overflow-hidden rounded-2xl border border-border/60 bg-background/80">
-							<div
-								className="flex transition-transform duration-500 ease-out"
-								style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-							>
-								{heroSlides.map((product) => (
-									<Link
-										key={product.productId}
-										to="/product/$productId"
-										params={{ productId: product.productId.toString() }}
-										className="min-w-full p-4 sm:p-5"
-									>
-										<img
-											src={product.imageUrl}
-											alt={product.name}
-											className="h-48 w-full rounded-xl border border-border/70 object-cover sm:h-56"
-										/>
-										<p className="mt-4 line-clamp-1 text-base font-semibold">
-											{product.name}
-										</p>
-										<p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-											{product.description}
-										</p>
-										<div className="mt-3 flex items-center justify-between">
-											<span className="text-base font-semibold">
-												{formatNumberToCurrency(product.price)}
-											</span>
-											<span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-												{formatNumberToPercentage(product.discount)} Off
-											</span>
-										</div>
-									</Link>
-								))}
-							</div>
+							{isLoading ? (
+								<div className="space-y-3 p-5">
+									<div className="h-56 animate-pulse rounded-xl bg-muted" />
+									<div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
+									<div className="h-4 w-full animate-pulse rounded bg-muted" />
+								</div>
+							) : heroSlides.length === 0 ? (
+								<div className="p-6 text-sm text-muted-foreground">
+									Featured products will appear here.
+								</div>
+							) : (
+								<div
+									className="flex transition-transform duration-500 ease-out"
+									style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+								>
+									{heroSlides.map((product) => (
+										<Link
+											key={product.productId}
+											to="/product/$productId"
+											params={{
+												productId: product.productId?.toString() ?? "0",
+											}}
+											className="min-w-full p-4 sm:p-5"
+										>
+											<img
+												src={product.imageUrl}
+												alt={product.name}
+												className="h-48 w-full rounded-xl border border-border/70 object-cover sm:h-56"
+											/>
+											<p className="mt-4 line-clamp-1 text-base font-semibold">
+												{product.name}
+											</p>
+											<p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+												{product.description}
+											</p>
+											<div className="mt-3 flex items-center justify-between">
+												<span className="text-base font-semibold">
+													{formatNumberToCurrency(product.price ?? 0)}
+												</span>
+												<span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+													{formatNumberToPercentage(product.discount ?? 0)} Off
+												</span>
+											</div>
+										</Link>
+									))}
+								</div>
+							)}
 
 							<div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background/25 to-transparent" />
 
@@ -190,31 +213,42 @@ function App() {
 				</div>
 
 				<div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					{trendingProducts.map((product) => (
-						<Link
-							key={product.productId}
-							to="/product/$productId"
-							params={{ productId: product.productId.toString() }}
-							className="group rounded-2xl border border-border/70 bg-card/80 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-border hover:shadow-md"
-						>
-							<img
-								src={product.imageUrl}
-								alt={product.name}
-								className="h-32 w-full rounded-lg border border-border/70 object-cover"
-							/>
-							<p className="mt-3 line-clamp-1 text-sm font-medium">
-								{product.name}
-							</p>
-							<div className="mt-2 flex items-center justify-between">
-								<span className="text-sm font-semibold">
-									{formatNumberToCurrency(product.price)}
-								</span>
-								<span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
-									{formatNumberToPercentage(product.discount)} Off
-								</span>
-							</div>
-						</Link>
-					))}
+					{isLoading
+						? trendingSkeletonKeys.map((key) => (
+								<div
+									key={key}
+									className="rounded-2xl border border-border/70 bg-card/80 p-4"
+								>
+									<div className="h-32 w-full animate-pulse rounded-lg bg-muted" />
+									<div className="mt-3 h-4 w-3/4 animate-pulse rounded bg-muted" />
+									<div className="mt-2 h-4 w-1/2 animate-pulse rounded bg-muted" />
+								</div>
+							))
+						: trendingProducts.map((product) => (
+								<Link
+									key={product.productId}
+									to="/product/$productId"
+									params={{ productId: product.productId?.toString() ?? "0" }}
+									className="group rounded-2xl border border-border/70 bg-card/80 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-border hover:shadow-md"
+								>
+									<img
+										src={product.imageUrl}
+										alt={product.name}
+										className="h-32 w-full rounded-lg border border-border/70 object-cover"
+									/>
+									<p className="mt-3 line-clamp-1 text-sm font-medium">
+										{product.name}
+									</p>
+									<div className="mt-2 flex items-center justify-between">
+										<span className="text-sm font-semibold">
+											{formatNumberToCurrency(product.price ?? 0)}
+										</span>
+										<span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+											{formatNumberToPercentage(product.discount ?? 0)} Off
+										</span>
+									</div>
+								</Link>
+							))}
 				</div>
 
 				<div className="mt-8 rounded-3xl border border-border/70 bg-card p-5 shadow-sm sm:p-6">
@@ -233,24 +267,35 @@ function App() {
 					</div>
 
 					<div className="mt-5 grid gap-4 md:grid-cols-3">
-						{spotlightProducts.map((product) => (
-							<Link
-								key={product.productId}
-								to="/product/$productId"
-								params={{ productId: product.productId.toString() }}
-								className="rounded-2xl border border-border/70 bg-background/70 p-4 transition-colors hover:bg-accent"
-							>
-								<p className="line-clamp-1 text-base font-medium">
-									{product.name}
-								</p>
-								<p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-									{product.description}
-								</p>
-								<p className="mt-3 text-sm font-semibold">
-									{formatNumberToCurrency(product.price)}
-								</p>
-							</Link>
-						))}
+						{isLoading
+							? spotlightSkeletonKeys.map((key) => (
+									<div
+										key={key}
+										className="rounded-2xl border border-border/70 bg-background/70 p-4"
+									>
+										<div className="h-5 w-2/3 animate-pulse rounded bg-muted" />
+										<div className="mt-2 h-4 w-full animate-pulse rounded bg-muted" />
+										<div className="mt-3 h-4 w-1/3 animate-pulse rounded bg-muted" />
+									</div>
+								))
+							: spotlightProducts.map((product) => (
+									<Link
+										key={product.productId}
+										to="/product/$productId"
+										params={{ productId: product.productId?.toString() ?? "0" }}
+										className="rounded-2xl border border-border/70 bg-background/70 p-4 transition-colors hover:bg-accent"
+									>
+										<p className="line-clamp-1 text-base font-medium">
+											{product.name}
+										</p>
+										<p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+											{product.description}
+										</p>
+										<p className="mt-3 text-sm font-semibold">
+											{formatNumberToCurrency(product.price ?? 0)}
+										</p>
+									</Link>
+								))}
 					</div>
 				</div>
 			</div>

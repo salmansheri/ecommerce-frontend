@@ -1,5 +1,4 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-
 import { ArrowDown, ArrowDownUp, ArrowUp, CheckIcon } from "lucide-react";
 import z from "zod";
 import { CustomSelect } from "@/components/custom-select";
@@ -15,14 +14,14 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useGetCategories } from "@/hooks/categories/use-get-categories";
-import {useGetProducts} from "@/hooks/products/use-get-products.ts";
+import { useGetProducts } from "@/hooks/products/use-get-products.ts";
 
 const productSearchSchema = z.object({
 	page: z.number().default(0),
 	category: z.string().default(""),
 	sortBy: z.string().default(""),
 	sortOrder: z.string().default(""),
-	keyword: z.string().default("")
+	keyword: z.string().default(""),
 });
 
 export const Route = createFileRoute("/product/")({
@@ -41,8 +40,6 @@ const sortOptions = [
 	{ label: "Newest First", value: "createdAt", order: "desc" },
 	{ label: "Oldest First", value: "createdAt", order: "asc" },
 ];
-
-
 
 function SortButton() {
 	const { sortBy, sortOrder } = Route.useSearch();
@@ -97,15 +94,58 @@ function SortButton() {
 	);
 }
 
+const productSkeletonKeys = [
+	"product-1",
+	"product-2",
+	"product-3",
+	"product-4",
+	"product-5",
+	"product-6",
+	"product-7",
+	"product-8",
+] as const;
+
+function ProductGridSkeleton() {
+	return (
+		<>
+			<div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+				<div className="h-4 w-52 animate-pulse rounded bg-muted" />
+				<div className="h-3 w-24 animate-pulse rounded bg-muted" />
+			</div>
+			<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+				{productSkeletonKeys.map((key) => (
+					<div key={key} className="rounded-2xl border bg-card/80 p-4">
+						<div className="h-44 w-full animate-pulse rounded-xl bg-muted" />
+						<div className="mt-4 h-4 w-2/3 animate-pulse rounded bg-muted" />
+						<div className="mt-2 h-3 w-full animate-pulse rounded bg-muted" />
+						<div className="mt-3 h-4 w-1/3 animate-pulse rounded bg-muted" />
+					</div>
+				))}
+			</div>
+			<div className="mt-8 border-t pt-4">
+				<div className="mx-auto h-8 w-64 animate-pulse rounded bg-muted" />
+			</div>
+		</>
+	);
+}
+
 function Product() {
 	const { page, category, sortOrder, sortBy, keyword } = Route.useSearch();
-	console.log("Category: ", category);
 
 	const pageSize = 10;
 
-	const { data: products, isLoading: isProductsLoading } =
-		useGetProducts(page, pageSize, sortBy, sortOrder, keyword, category);
+	const { data: products, isLoading: isProductsLoading } = useGetProducts(
+		page,
+		pageSize,
+		sortBy,
+		sortOrder,
+		keyword,
+		category,
+	);
+
+	console.log("Products = " + JSON.stringify(products));
 	const { data: categories, isLoading: isLoadingCategory } = useGetCategories();
+	const isPageLoading = isLoadingCategory || isProductsLoading;
 
 	const categoryList = categories?.data ?? [];
 
@@ -138,15 +178,33 @@ function Product() {
 						</div>
 						<div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
 							<div className="rounded-xl border bg-background/70 p-3 text-center">
-								<p className="text-xl font-bold">{totalProducts}</p>
+								<p className="text-xl font-bold">
+									{isPageLoading ? (
+										<span className="mx-auto block h-7 w-10 animate-pulse rounded bg-muted" />
+									) : (
+										totalProducts
+									)}
+								</p>
 								<p className="text-xs text-muted-foreground">Products</p>
 							</div>
 							<div className="rounded-xl border bg-background/70 p-3 text-center">
-								<p className="text-xl font-bold">{totalPages}</p>
+								<p className="text-xl font-bold">
+									{isPageLoading ? (
+										<span className="mx-auto block h-7 w-10 animate-pulse rounded bg-muted" />
+									) : (
+										totalPages
+									)}
+								</p>
 								<p className="text-xs text-muted-foreground">Pages</p>
 							</div>
 							<div className="rounded-xl border bg-background/70 p-3 text-center col-span-2 sm:col-span-1">
-								<p className="text-xl font-bold">{categoryList.length}</p>
+								<p className="text-xl font-bold">
+									{isPageLoading ? (
+										<span className="mx-auto block h-7 w-10 animate-pulse rounded bg-muted" />
+									) : (
+										categoryList.length
+									)}
+								</p>
 								<p className="text-xs text-muted-foreground">Categories</p>
 							</div>
 						</div>
@@ -163,7 +221,9 @@ function Product() {
 					<div className="flex flex-col items-center gap-3">
 						<CustomSelect value={category} data={categories?.data} />
 						<SortButton />
-						{category ? (
+						{isPageLoading ? (
+							<span className="min-w-27.5 h-7 animate-pulse rounded-full bg-muted" />
+						) : category ? (
 							<span className="min-w-27.5 rounded-full border bg-muted px-3 py-1 text-center text-xs font-medium text-muted-foreground">
 								Category: {category}
 							</span>
@@ -179,7 +239,10 @@ function Product() {
 					className="mt-8 
 				rounded-3xl border bg-card p-5 shadow-sm sm:p-6"
 				>
-					<LoaderWrapper isLoading={isLoadingCategory || isProductsLoading}>
+					<LoaderWrapper
+						isLoading={isPageLoading}
+						fallback={<ProductGridSkeleton />}
+					>
 						<div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
 							<p className="text-sm text-muted-foreground">
 								Showing {startIndex + 1}-{endIndex} of {totalProducts} products
