@@ -41,7 +41,7 @@ const settingsSections = [
 
 type SectionId = (typeof settingsSections)[number]["id"];
 
-export const Route = createFileRoute("/settings/")({
+export const Route = createFileRoute("/store/settings/")({
 	component: SettingsPage,
 });
 
@@ -59,11 +59,11 @@ function SettingsPage() {
 
 	const handleSave = () => {
 		toast.success("Settings saved");
-	};
+	}
 
 	const handleSignOut = () => {
 		signOut({});
-	};
+	}
 
 	const renderSection = () => {
 		switch (activeSection) {
@@ -105,7 +105,7 @@ function SettingsPage() {
 									<div className="space-y-2">
 										<Label htmlFor={`${uid}-username`}>Username</Label>
 										<Input
-											id={`${uid}-username`}
+											id={"${uid}-username"}
 											defaultValue={username ?? ""}
 											className="h-10 bg-background/70"
 										/>
@@ -113,7 +113,7 @@ function SettingsPage() {
 									<div className="space-y-2">
 										<Label htmlFor={`${uid}-email`}>Email</Label>
 										<Input
-											id={`${uid}-email`}
+											id={"${uid}-email"}
 											type="email"
 											placeholder="user@example.com"
 											className="h-10 bg-background/70"
@@ -124,7 +124,7 @@ function SettingsPage() {
 									<div className="space-y-2">
 										<Label htmlFor={`${uid}-phone`}>Phone</Label>
 										<Input
-											id={`${uid}-phone`}
+											id={"${uid}-phone"}
 											placeholder="+1 (555) 000-0000"
 											className="h-10 bg-background/70"
 										/>
@@ -132,7 +132,7 @@ function SettingsPage() {
 									<div className="space-y-2">
 										<Label htmlFor={`${uid}-location`}>Location</Label>
 										<Input
-											id={`${uid}-location`}
+											id={"${uid}-location"}
 											placeholder="New York, USA"
 											className="h-10 bg-background/70"
 										/>
@@ -151,7 +151,7 @@ function SettingsPage() {
 							</div>
 						</CardContent>
 					</Card>
-				);
+				)
 
 			case "password":
 				return (
@@ -167,7 +167,7 @@ function SettingsPage() {
 								<Label htmlFor={`${uid}-current-password`}>Current password</Label>
 								<div className="relative">
 									<Input
-										id={`${uid}-current-password`}
+										id={"${uid}-current-password"}
 										type={showCurrentPassword ? "text" : "password"}
 										placeholder="Enter current password"
 										className="h-10 bg-background/70 pr-10"
@@ -190,7 +190,7 @@ function SettingsPage() {
 									<Label htmlFor={`${uid}-new-password`}>New password</Label>
 									<div className="relative">
 										<Input
-											id={`${uid}-new-password`}
+											id={"${uid}-new-password"}
 											type={showNewPassword ? "text" : "password"}
 											placeholder="Enter new password"
 											className="h-10 bg-background/70 pr-10"
@@ -211,7 +211,7 @@ function SettingsPage() {
 								<div className="space-y-2">
 									<Label htmlFor={`${uid}-confirm-password`}>Confirm password</Label>
 									<Input
-										id={`${uid}-confirm-password`}
+										id={"${uid}-confirm-password"}
 										type="password"
 										placeholder="Re-enter new password"
 										className="h-10 bg-background/70"
@@ -229,7 +229,7 @@ function SettingsPage() {
 							</div>
 						</CardContent>
 					</Card>
-				);
+				)
 
 			case "notifications":
 				return (
@@ -279,7 +279,7 @@ function SettingsPage() {
 							</div>
 						</CardContent>
 					</Card>
-				);
+				)
 
 			case "appearance":
 				return (
@@ -332,7 +332,7 @@ function SettingsPage() {
 							</div>
 						</CardContent>
 					</Card>
-				);
+				)
 
 			case "danger":
 				return (
@@ -379,9 +379,9 @@ function SettingsPage() {
 							</div>
 						</CardContent>
 					</Card>
-				);
+				)
 		}
-	};
+	}
 
 	return (
 		<section className="min-h-screen bg-linear-to-b from-background via-background to-muted/30 px-4 py-8 sm:px-6 lg:px-8">
@@ -426,7 +426,7 @@ function SettingsPage() {
 										}`}
 									/>
 								</button>
-							);
+							)
 						})}
 					</nav>
 
@@ -435,5 +435,5 @@ function SettingsPage() {
 				</div>
 			</div>
 		</section>
-	);
+	)
 }

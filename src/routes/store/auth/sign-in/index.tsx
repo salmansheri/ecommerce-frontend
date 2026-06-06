@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { SignInForm } from "@/components/sign-in-form";
 
-export const Route = createFileRoute("/auth/sign-in/")({
+export const Route = createFileRoute("/store/auth/sign-in/")({
 	component: SignInPage,
 });
 
@@ -48,5 +48,5 @@ function SignInPage() {
 				</div>
 			</div>
 		</section>
-	);
+	)
 }

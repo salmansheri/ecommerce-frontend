@@ -24,7 +24,7 @@ const productSearchSchema = z.object({
 	keyword: z.string().default(""),
 });
 
-export const Route = createFileRoute("/product/")({
+export const Route = createFileRoute("/store/product/")({
 	component: Product,
 	loader: () => {
 		// throw new Error("Some went wrong")
@@ -47,14 +47,14 @@ function SortButton() {
 
 	const activeOption = sortOptions.find(
 		(o) => o.value === sortBy && o.order === sortOrder,
-	);
+	)
 
 	const SortIcon =
 		!sortBy || !sortOrder
 			? ArrowDownUp
 			: sortOrder === "asc"
 				? ArrowUp
-				: ArrowDown;
+				: ArrowDown
 
 	return (
 		<DropdownMenu>
@@ -87,11 +87,11 @@ function SortButton() {
 							<span className="flex-1">{option.label}</span>
 							{isActive && <CheckIcon className="size-4 text-primary" />}
 						</DropdownMenuItem>
-					);
+					)
 				})}
 			</DropdownMenuContent>
 		</DropdownMenu>
-	);
+	)
 }
 
 const productSkeletonKeys = [
@@ -126,7 +126,7 @@ function ProductGridSkeleton() {
 				<div className="mx-auto h-8 w-64 animate-pulse rounded bg-muted" />
 			</div>
 		</>
-	);
+	)
 }
 
 function Product() {
@@ -141,7 +141,7 @@ function Product() {
 		sortOrder,
 		keyword,
 		category,
-	);
+	)
 
 	console.log("Products = " + JSON.stringify(products));
 	const { data: categories, isLoading: isLoadingCategory } = useGetCategories();
@@ -263,5 +263,5 @@ function Product() {
 				</div>
 			</div>
 		</section>
-	);
+	)
 }

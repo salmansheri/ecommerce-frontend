@@ -18,15 +18,15 @@ import {UseSignOut} from "@/hooks/auth/use-sign-out";
 import { SearchSuggestions } from "@/components/search-suggestions";
 
 const navigationLinks = [
-  { label: "Home", to: "/" },
-  { label: "Shop", to: "/product" },
-  { label: "Cart", to: "/cart" },
+  { label: "Home", to: "/store/home" },
+  { label: "Shop", to: "/store/product" },
+  { label: "Cart", to: "/store/cart" },
   {
     label: "Deals",
-    to: "/product",
+    to: "/store/product",
     search: { sortBy: "price", sortOrder: "asc", page: 1, category: "" },
   },
-  { label: "New Arrivals", to: "/product", search: { page: 1, category: "" } },
+  { label: "New Arrivals", to: "/store/product", search: { page: 1, category: "" } },
 ] as const;
 
 const Header = () => {
@@ -59,7 +59,7 @@ const Header = () => {
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-3">
           <Link
-            to="/"
+            to="/store/home"
             className="group inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-2 shadow-sm transition-colors hover:bg-accent"
           >
             <span className="inline-flex size-8 items-center justify-center rounded-full bg-foreground text-background transition-transform duration-300 group-hover:rotate-6">
@@ -81,7 +81,7 @@ const Header = () => {
               <Heart className="size-4" />
             </Button>
             <Button asChild variant="ghost" size="icon" aria-label="Cart">
-              <Link to="/cart" className="relative">
+              <Link to="/store/cart" className="relative">
                 <ShoppingCart className="size-4" />
                 {cartItemCount > 0 && (
                   <span className="absolute -right-2 -top-2 inline-flex min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-medium leading-none text-background">
@@ -98,7 +98,7 @@ const Header = () => {
                 asChild
                 className="hidden rounded-full px-5 sm:inline-flex"
               >
-                <Link to="/auth/sign-in">Sign In</Link>
+                <Link to="/store/auth/sign-in">Sign In</Link>
               </Button>
             ) : (
               <DropdownMenu>
@@ -113,7 +113,7 @@ const Header = () => {
                 <DropdownMenuContent>
                   <DropdownMenuGroup>
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => navigate({to: "/settings"})}>Settings</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate({to: "/store/settings"})}>Settings</DropdownMenuItem>
                     <DropdownMenuItem>Orders</DropdownMenuItem>
                     {isAdmin && (
                         <DropdownMenuItem onClick={() => navigate({ to: "/admin"})}>Admin Panel</DropdownMenuItem>

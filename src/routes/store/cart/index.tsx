@@ -24,7 +24,7 @@ import {
 } from "@/lib/cart-store";
 import { formatNumberToCurrency } from "@/lib/utils";
 
-export const Route = createFileRoute("/cart/")({
+export const Route = createFileRoute("/store/cart/")({
 	component: CartPage,
 });
 
@@ -47,11 +47,11 @@ function CartPage() {
 		const subtotal = cartProducts.reduce(
 			(total, item) => total + item.baseAmount,
 			0,
-		);
+		)
 		const discount = cartProducts.reduce(
 			(total, item) => total + item.discountAmount,
 			0,
-		);
+		)
 		const netAmount = subtotal - discount;
 		const shipping = netAmount <= 0 ? 0 : netAmount >= 2500 ? 0 : 99;
 		const tax = (subtotal - discount) * 0.05;
@@ -63,23 +63,23 @@ function CartPage() {
 	const increaseQuantity = (productId: number) => {
 		addToCart(productId, 1);
 		createCart({ path: { productId, quantity: 1 } });
-	};
+	}
 
 	const decreaseQuantity = (productId: number) => {
 		const activeItem = cartItems.find((item) => item.productId === productId);
 
 		if (!activeItem) {
-			return;
+			return
 		}
 
 		setCartItemQuantity(productId, activeItem.quantity - 1);
-	};
+	}
 
 	const removeItem = (productId: number) => {
 		const cartId = cart?.cartId;
 		if (!cartId) {
 			removeFromCart(productId);
-			return;
+			return
 		}
 
 		removeCartItem({
@@ -87,8 +87,8 @@ function CartPage() {
 				cartId,
 				productId,
 			},
-		});
-	};
+		})
+	}
 
 	return (
 		<section className="relative isolate min-h-[calc(100dvh-8rem)] overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
@@ -291,5 +291,5 @@ function CartPage() {
 				</div>
 			</div>
 		</section>
-	);
+	)
 }

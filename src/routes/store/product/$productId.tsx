@@ -15,7 +15,7 @@ import { formatNumberToCurrency, formatNumberToPercentage } from "@/lib/utils";
 import {useGetProductById} from "@/hooks/products/use-get-product-by-id.ts";
 import {Loader} from "@/components/loader.tsx";
 
-export const Route = createFileRoute("/product/$productId")({
+export const Route = createFileRoute("/store/product/$productId")({
 	component: RouteComponent,
 });
 
@@ -43,7 +43,7 @@ function RouteComponent() {
 					</Button>
 				</div>
 			</section>
-		);
+		)
 	}
 
 	const isAvailable = (product.quantity ?? 0) > 0;
@@ -55,13 +55,13 @@ function RouteComponent() {
 		"Genuine quality checked product",
 		"Secure payment with instant confirmation",
 		"Fast dispatch and reliable delivery tracking",
-	];
+	]
 	const previewTiles = [1, 2, 3, 4];
 
 	const handleAddToCart = () => {
 		addToCart((product.productId ?? 0), 1);
 		toast.success(`${product.name} added to cart`);
-	};
+	}
 
 	if (isLoading) {
 		return (
@@ -102,7 +102,7 @@ function RouteComponent() {
 						<div className="mt-4 grid grid-cols-4 gap-3">
 							{previewTiles.map((tile) => (
 								<div
-									key={`thumb-${tile}`}
+									key={"thumb-${tile}"}
 									className="aspect-square overflow-hidden rounded-xl border bg-background/70"
 								>
 									<img
@@ -249,5 +249,5 @@ function RouteComponent() {
 				</div>
 			</div>
 		</section>
-	);
+	)
 }

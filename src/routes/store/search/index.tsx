@@ -9,7 +9,7 @@ const searchSchema = z.object({
 	q: z.string(),
 });
 
-export const Route = createFileRoute("/search/")({
+export const Route = createFileRoute("/store/search/")({
 	validateSearch: searchSchema,
 	component: SearchPage,
 });
@@ -20,7 +20,7 @@ function SearchPage() {
 
 	const { data: productsData, isLoading } = useGetProducts(
 		0, 20, "", "", hasQuery ? q : undefined,
-	);
+	)
 
 	const productList = productsData?.data ?? [];
 
@@ -39,7 +39,7 @@ function SearchPage() {
 					</div>
 				</div>
 			</section>
-		);
+		)
 	}
 
 	return (
@@ -80,5 +80,5 @@ function SearchPage() {
 				</LoaderWrapper>
 			</div>
 		</section>
-	);
+	)
 }
