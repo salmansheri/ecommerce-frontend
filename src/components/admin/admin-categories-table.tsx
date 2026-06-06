@@ -1,6 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import {
+	Boxes,
 	Filter,
+	Hash,
 	Loader,
 	MoreHorizontal,
 	Pencil,
@@ -29,6 +31,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Table,
 	TableBody,
@@ -37,74 +40,45 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import type { ProductDto } from "@/generated";
-import { useDeleteProduct } from "@/hooks/products/use-delete-product";
-import { formatNumberToCurrency } from "@/lib/utils";
+import type { CategoryDto } from "@/generated";
+import { useDeleteCategory } from "@/hooks/categories/use-delete-category";
 
-interface AdminProductsTableProps {
-	products: ProductDto[];
+interface AdminCategoriesTableProps {
+	categories: CategoryDto[];
 	isLoading?: boolean;
 }
 
-function getStatus(quantity: number) {
-	if (quantity > 20) {
-		return "Active";
-	}
-	if (quantity > 0) {
-		return "Low Stock";
-	}
-	return "Out of Stock";
-}
-
-function statusClass(status: ReturnType<typeof getStatus>) {
-	if (status === "Active") {
-		return "bg-emerald-500/10 text-emerald-300 ring-emerald-400/30";
-	}
-	if (status === "Low Stock") {
-		return "bg-amber-500/10 text-amber-300 ring-amber-400/30";
-	}
-	return "bg-rose-500/10 text-rose-300 ring-rose-400/30";
-}
-
-export function AdminProductsTable({
-	products,
+export function AdminCategoriesTable({
+	categories,
 	isLoading = false,
-}: AdminProductsTableProps) {
+}: AdminCategoriesTableProps) {
 	const navigate = useNavigate();
-	const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
+	const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
 	const [query, setQuery] = useState("");
-	const [statusFilter, setStatusFilter] = useState<
-		"all" | "Active" | "Low Stock" | "Out of Stock"
-	>("all");
-	const [productToDelete, setProductToDelete] = useState<ProductDto | null>(
+	const [categoryToDelete, setCategoryToDelete] = useState<CategoryDto | null>(
 		null,
 	);
 
-	const filteredProducts = useMemo(() => {
+	const filteredCategories = useMemo(() => {
 		const q = query.trim().toLowerCase();
-		return products.filter((product) => {
-			const status = getStatus(product.quantity ?? 0);
-			if (statusFilter !== "all" && status !== statusFilter) {
-				return false;
-			}
-			if (!q) {
-				return true;
-			}
-			const name = product.name?.toLowerCase() ?? "";
-			const id = product.productId?.toString() ?? "";
-			const description = product.description?.toLowerCase() ?? "";
-			return name.includes(q) || id.includes(q) || description.includes(q);
+		if (!q) {
+			return categories;
+		}
+		return categories.filter((category) => {
+			const name = category.name?.toLowerCase() ?? "";
+			const id = category.id?.toString() ?? "";
+			return name.includes(q) || id.includes(q);
 		});
-	}, [products, query, statusFilter]);
+	}, [categories, query]);
 
 	const handleConfirmDelete = () => {
-		if (!productToDelete?.productId) {
+		if (!categoryToDelete?.id) {
 			return;
 		}
-		deleteProduct(
-			{ path: { id: productToDelete.productId } },
+		deleteCategory(
+			{ path: { categoryId: categoryToDelete.id } },
 			{
-				onSettled: () => setProductToDelete(null),
+				onSettled: () => setCategoryToDelete(null),
 			},
 		);
 	};
@@ -116,10 +90,16 @@ export function AdminProductsTable({
 				<div className="relative flex flex-col gap-3 border-b border-white/5 p-4 sm:flex-row sm:items-center sm:justify-between">
 					<div>
 						<h2 className="text-base font-semibold tracking-tight text-white sm:text-lg">
-							Product Catalog
+							Category Catalog
 						</h2>
 						<p className="text-xs text-zinc-500 sm:text-sm">
-							{filteredProducts.length} of {products.length} products
+							{isLoading ? (
+								<Skeleton className="inline-block h-3 w-32 bg-zinc-800" />
+							) : (
+								<>
+									{filteredCategories.length} of {categories.length} categories
+								</>
+							)}
 						</p>
 					</div>
 					<div className="flex flex-wrap items-center gap-2">
@@ -132,19 +112,6 @@ export function AdminProductsTable({
 								className="h-10 w-full rounded-xl border-white/10 bg-zinc-950/50 pl-9 text-zinc-100 placeholder:text-zinc-500 focus-visible:border-indigo-400/40 focus-visible:ring-indigo-400/20 sm:w-64"
 							/>
 						</div>
-						<select
-							value={statusFilter}
-							onChange={(event) =>
-								setStatusFilter(event.target.value as typeof statusFilter)
-							}
-							className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-zinc-200 outline-none transition-colors hover:border-white/20 hover:bg-white/10 focus-visible:border-indigo-400/40 focus-visible:ring-2 focus-visible:ring-indigo-400/20"
-							aria-label="Filter by status"
-						>
-							<option value="all">All Status</option>
-							<option value="Active">Active</option>
-							<option value="Low Stock">Low Stock</option>
-							<option value="Out of Stock">Out of Stock</option>
-						</select>
 						<Button
 							variant="outline"
 							size="icon"
@@ -154,11 +121,13 @@ export function AdminProductsTable({
 							<Filter className="size-4" />
 						</Button>
 						<Button
-							onClick={() => navigate({ to: "/admin/products/create-product" })}
+							onClick={() =>
+								navigate({ to: "/admin/categories/create-category" })
+							}
 							className="h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-[0_8px_24px_rgba(99,102,241,0.35)] hover:from-indigo-400 hover:to-violet-400"
 						>
 							<Plus className="size-4" />
-							Add Product
+							Add Category
 						</Button>
 					</div>
 				</div>
@@ -167,79 +136,82 @@ export function AdminProductsTable({
 					<Table>
 						<TableHeader>
 							<TableRow className="border-white/5 hover:bg-transparent">
-								<TableHead className="text-zinc-500">Product</TableHead>
-								<TableHead className="text-right text-zinc-500">
-									Discount
-								</TableHead>
-								<TableHead className="text-right text-zinc-500">
-									Stock
-								</TableHead>
-								<TableHead className="text-right text-zinc-500">
-									Price
-								</TableHead>
-								<TableHead className="text-zinc-500">Status</TableHead>
+								<TableHead className="text-zinc-500">Category</TableHead>
+								<TableHead className="text-zinc-500">Slug</TableHead>
 								<TableHead className="w-12" />
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{isLoading && (
-								<TableRow className="border-white/5 hover:bg-transparent">
-									<TableCell
-										colSpan={6}
-										className="py-8 text-center text-zinc-500"
+							{isLoading &&
+								["a", "b", "c", "d", "e"].map((slot) => (
+									<TableRow
+										key={`skeleton-${slot}`}
+										className="border-white/5 hover:bg-transparent"
 									>
-										Loading products...
-									</TableCell>
-								</TableRow>
-							)}
+										<TableCell>
+											<div className="flex items-center gap-3">
+												<Skeleton className="size-9 rounded-lg bg-zinc-800" />
+												<div className="space-y-1.5">
+													<Skeleton className="h-3.5 w-32 bg-zinc-800" />
+													<Skeleton className="h-3 w-16 bg-zinc-800" />
+												</div>
+											</div>
+										</TableCell>
+										<TableCell>
+											<Skeleton className="h-3.5 w-40 bg-zinc-800" />
+										</TableCell>
+										<TableCell>
+											<Skeleton className="ml-auto h-8 w-8 rounded-lg bg-zinc-800" />
+										</TableCell>
+									</TableRow>
+								))}
 
-							{!isLoading && filteredProducts.length === 0 && (
+							{!isLoading && filteredCategories.length === 0 && (
 								<TableRow className="border-white/5 hover:bg-transparent">
 									<TableCell
-										colSpan={6}
-										className="py-8 text-center text-zinc-500"
+										colSpan={3}
+										className="py-10 text-center text-zinc-500"
 									>
-										{query || statusFilter !== "all"
-											? "No products match your filters."
-											: "No products found."}
+										{query
+											? "No categories match your search."
+											: "No categories found."}
 									</TableCell>
 								</TableRow>
 							)}
 
 							{!isLoading &&
-								filteredProducts.map((product) => {
-									const quantity = product.quantity ?? 0;
-									const status = getStatus(quantity);
+								filteredCategories.map((category) => {
+									const slug =
+										category.name
+											?.toLowerCase()
+											.trim()
+											.replace(/[^a-z0-9]+/g, "-")
+											.replace(/(^-|-$)/g, "") ?? "";
 
 									return (
 										<TableRow
-											key={product.productId ?? product.name}
+											key={category.id ?? category.name}
 											className="border-white/5 transition-colors hover:bg-white/[0.02]"
 										>
 											<TableCell>
-												<div className="space-y-0.5">
-													<p className="font-medium text-zinc-100">
-														{product.name}
-													</p>
-													<p className="text-xs text-zinc-500">
-														PRD-{product.productId ?? "N/A"}
-													</p>
+												<div className="flex items-center gap-3">
+													<span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-violet-500/20 text-indigo-300 ring-1 ring-indigo-400/30">
+														<Boxes className="size-4" />
+													</span>
+													<div className="space-y-0.5">
+														<p className="font-medium text-zinc-100">
+															{category.name}
+														</p>
+														<p className="text-xs text-zinc-500">
+															CAT-{category.id ?? "N/A"}
+														</p>
+													</div>
 												</div>
 											</TableCell>
-											<TableCell className="text-right text-zinc-300">
-												{product.discount ?? 0}%
-											</TableCell>
-											<TableCell className="text-right text-zinc-300">
-												{quantity}
-											</TableCell>
-											<TableCell className="text-right font-medium text-white">
-												{formatNumberToCurrency(product.price ?? 0)}
-											</TableCell>
 											<TableCell>
-												<span
-													className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ring-1 ${statusClass(status)}`}
-												>
-													{status}
+												<span className="inline-flex items-center gap-1.5 font-mono text-xs text-zinc-400">
+													<Hash className="size-3 text-zinc-500" />
+													{slug || "—"}
 												</span>
 											</TableCell>
 											<TableCell>
@@ -261,13 +233,13 @@ export function AdminProductsTable({
 														<DropdownMenuItem
 															onSelect={() =>
 																navigate({
-																	to: `/admin/products/edit/$productId`,
+																	to: "/admin/categories/edit/$categoryId",
 																	params: {
-																		productId:
-																			product.productId?.toString() ?? "",
+																		categoryId: String(category.id ?? ""),
 																	},
 																})
 															}
+															disabled={!category.id}
 															className="cursor-pointer focus:bg-white/5 focus:text-white"
 														>
 															<Pencil className="mr-2 size-3.5" />
@@ -276,8 +248,8 @@ export function AdminProductsTable({
 														<DropdownMenuSeparator className="bg-white/5" />
 														<DropdownMenuItem
 															variant="destructive"
-															onSelect={() => setProductToDelete(product)}
-															disabled={!product.productId}
+															onSelect={() => setCategoryToDelete(category)}
+															disabled={!category.id}
 															className="cursor-pointer text-rose-300 focus:bg-rose-500/10 focus:text-rose-200"
 														>
 															<Trash2 className="mr-2 size-3.5" />
@@ -295,8 +267,8 @@ export function AdminProductsTable({
 			</div>
 
 			<AlertDialog
-				open={productToDelete !== null}
-				onOpenChange={(open) => !open && setProductToDelete(null)}
+				open={categoryToDelete !== null}
+				onOpenChange={(open) => !open && setCategoryToDelete(null)}
 			>
 				<AlertDialogContent
 					size="sm"
@@ -307,14 +279,15 @@ export function AdminProductsTable({
 							<Trash2 className="size-7" />
 						</AlertDialogMedia>
 						<AlertDialogTitle className="text-white">
-							Delete product?
+							Delete category?
 						</AlertDialogTitle>
 						<AlertDialogDescription className="text-zinc-400">
 							This will permanently remove{" "}
 							<span className="font-medium text-zinc-200">
-								{productToDelete?.name ?? "this product"}
-							</span>{" "}
-							from your catalog. This action cannot be undone.
+								{categoryToDelete?.name ?? "this category"}
+							</span>
+							. Products in this category may become uncategorised. This action
+							cannot be undone.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -338,7 +311,7 @@ export function AdminProductsTable({
 									Deleting...
 								</>
 							) : (
-								"Delete product"
+								"Delete category"
 							)}
 						</AlertDialogAction>
 					</AlertDialogFooter>

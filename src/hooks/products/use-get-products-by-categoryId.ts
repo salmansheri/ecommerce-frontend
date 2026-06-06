@@ -1,19 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { getProductsByCategoryOptions } from "@/generated/@tanstack/react-query.gen";
 
-export const useGetProductsByCategoryId = (categoryId: number, pageNumber: number, pageSize: number ) => {
-	
+export const useGetProductsByCategoryId = (
+	categoryId: number,
+	pageNumber: number,
+	pageSize: number,
+) => {
 	return useQuery(
 		getProductsByCategoryOptions({
 			path: {
-				categoryId: categoryId
+				categoryId: categoryId,
 			},
 			query: {
 				pageNumber: pageNumber,
-				pageSize: pageSize, 
-				
-			}, 
-			
+				pageSize: pageSize,
+			},
 		}),
 	);
 };

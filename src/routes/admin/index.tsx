@@ -1,29 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AdminHeader } from "@/components/admin/admin-header";
-import { AdminInsights } from "@/components/admin/admin-insights";
-import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminStats } from "@/components/admin/admin-stats";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/admin/")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	return (
-		<div className="min-h-svh bg-gradient-to-br from-zinc-100 via-zinc-50 to-zinc-200 p-2 text-zinc-900 sm:p-4 lg:p-8 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 dark:text-zinc-100">
-			<div className="mx-auto w-full max-w-7xl">
-				<SidebarProvider defaultOpen>
-					<AdminSidebar />
-					<SidebarInset className="rounded-xl border border-zinc-200/70 bg-transparent p-0 shadow-none sm:rounded-2xl dark:border-zinc-800">
-						<section className="space-y-4 p-1 sm:space-y-6 sm:p-3">
-							<AdminHeader />
-							<AdminStats />
-							<AdminInsights />
-						</section>
-					</SidebarInset>
-				</SidebarProvider>
-			</div>
-		</div>
-	);
+	return <AdminStats />;
 }

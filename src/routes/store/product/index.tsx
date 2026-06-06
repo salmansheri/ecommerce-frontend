@@ -43,7 +43,7 @@ const sortOptions = [
 
 function SortButton() {
 	const { sortBy, sortOrder } = Route.useSearch();
-	const navigate = useNavigate({ from: "/product" });
+	const navigate = useNavigate();
 
 	const activeOption = sortOptions.find(
 		(o) => o.value === sortBy && o.order === sortOrder,

@@ -1,49 +1,40 @@
 import { Bell, Search } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function AdminHeader() {
 	return (
-		<header className="rounded-xl border border-zinc-200/70 bg-white/90 p-3 shadow-sm backdrop-blur-md sm:rounded-2xl sm:p-5 dark:border-zinc-800 dark:bg-zinc-900/80">
-			<div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-				<div className="flex items-start gap-3">
-					<SidebarTrigger className="mt-0.5 h-9 w-9 rounded-lg border border-zinc-200 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800" />
-					<div>
-						<p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-							Admin Home
-						</p>
-						<h1 className="mt-1 text-2xl font-bold tracking-tight">
-							Dashboard Overview
-						</h1>
-						<p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-							Monitor performance, process orders, and manage your marketplace.
-						</p>
-					</div>
+		<header className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-zinc-900/50 p-3 ring-1 ring-white/5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-4">
+			<div className="flex items-center gap-3">
+				<SidebarTrigger className="h-9 w-9 rounded-xl border border-white/10 bg-white/5 text-zinc-200 transition-colors hover:bg-white/10 hover:text-white" />
+				<div className="min-w-0">
+					<h1 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
+						Dashboard
+					</h1>
+					<p className="text-xs text-zinc-500">
+						Welcome back, here&apos;s what&apos;s happening today.
+					</p>
 				</div>
+			</div>
 
-				<div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center">
-					<div className="relative w-full">
-						<Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500" />
-						<Input
-							className="rounded-xl pl-9"
-							placeholder="Search orders, products..."
-						/>
-					</div>
-					<Button
-						variant="outline"
-						size="icon"
-						className="rounded-xl"
-						aria-label="Notifications"
-					>
-						<Bell className="size-4" />
-					</Button>
-					<Button className="rounded-xl">Create Product</Button>
-					<Avatar className="h-9 w-9 border border-zinc-200 dark:border-zinc-700">
-						<AvatarFallback>AD</AvatarFallback>
-					</Avatar>
+			<div className="flex items-center gap-2">
+				<div className="relative min-w-0 flex-1 sm:w-72 sm:flex-none">
+					<Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500" />
+					<Input
+						className="h-9 rounded-xl border-white/10 bg-zinc-950/50 pl-9 text-zinc-100 shadow-none placeholder:text-zinc-500 focus-visible:border-indigo-400/40 focus-visible:ring-indigo-400/20"
+						placeholder="Search..."
+					/>
 				</div>
+				<Button
+					variant="outline"
+					size="icon"
+					className="relative h-9 w-9 rounded-xl border-white/10 bg-white/5 text-zinc-200 hover:border-white/20 hover:bg-white/10 hover:text-white"
+					aria-label="Notifications"
+				>
+					<Bell className="size-4" />
+					<span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-fuchsia-400 shadow-[0_0_6px_rgba(232,121,249,0.8)]" />
+				</Button>
 			</div>
 		</header>
 	);
